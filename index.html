@@ -83,12 +83,12 @@
           <div class="input-row">
 
             <div class="input-group">
-              <label>Length <span class="tooltip" data-tooltip='Spacing must be in 0.25" increment'><span class="req">*</span></span></label>
+              <label>Length <span class="span2">(Inches)</span><span class="tooltip" data-tooltip='Spacing must be in 0.25" increment'><span class="req">*</span></span></label>
               <input type="number" name="len" min="1.5" max="144" step="0.25" placeholder='Choose from 1.5" to 144"' required />
             </div>
 
             <div class="input-group">
-              <label>Spacing <span class="tooltip" data-tooltip='Spacing must be in 0.5" increment'><span class="req">*</span></span></label>
+              <label>Spacing <span class="span2">(Inches)</span><span class="tooltip" data-tooltip='Spacing must be in 0.5" increment'><span class="req">*</span></span></label>
               <input type="number" name="space" min="1" placeholder='Min. 1"'  step="0.5" required />
             </div>
 
@@ -136,7 +136,10 @@
         <button type="submit" id="submit_btn">ADD TO CART</button>
       </div>
 
+      <p class="span2">Please note that all measurements are in inches</p>
+
     </form>
+
   </div>
 
   <script src="./js/customization.js"></script>

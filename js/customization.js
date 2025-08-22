@@ -5,6 +5,7 @@
 - Fix the Set Unique Project Name
 - Clear all fields button
 - Multi Pricing Calculator
+- Calculate total order price
 
 */
 
@@ -225,11 +226,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       <div class="input-row">
         <div class="input-group">
-          <label>Length <span class="tooltip" data-tooltip='Spacing must be in 0.25" increment'><span class="req">*</span></span></label>
+          <label>Length <span class="span2">(Inches)</span><span class="tooltip" data-tooltip='Spacing must be in 0.25" increment'><span class="req">*</span></span></label>
           <input type="number" name="len" min="1.5" max="144" step="0.25" placeholder='Choose from 1.5" to 144"' required />
         </div>
         <div class="input-group">
-          <label>Spacing <span class="tooltip" data-tooltip='Spacing must be in 0.5" increment'><span class="req">*</span></span></label>
+          <label>Spacing <span class="span2">(Inches)</span><span class="tooltip" data-tooltip='Spacing must be in 0.5" increment'><span class="req">*</span></span></label>
           <input type="number" name="space" min="1" placeholder='Min. 1"' step="0.5" required />
         </div>
       </div>
@@ -261,10 +262,37 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // If same items, different sizes (Multi Product Calculator)
+    let calc_type;
+    for (let choice_data of choices){
+
+      if (choices.length === 1){
+        calc_type = "Single";
+        break;
+      }
+
+      else if (choices.every(c => c.zclip === choice_data.zclip)) {
+        calc_type = "Multi";
+        break;
+      }
+
+      else{
+        calc_type = "Single";
+        break;
+      }
+    }
+
+    console.log(calc_type);
 
     // If different items (Single Product Calculator)
+    if(calc_type === "Multi"){
+      console.log("All choices have the same Z Clip type, using Multi Product Calculator.");
+    }
 
     // If one item (Single Product Calculator)
+    else if(calc_type === "Single") {
+      console.log("Different Z Clip types found, using Single Product Calculator.");
+      //ADD CALCULATION FOR SINGLE PRODUCT
+    }
 
     calculateSinglePrice(choices);
 
@@ -297,7 +325,7 @@ function calculateLeadIn(choices){
 
     if(Number.isInteger(leadIn)){
       leadIn = leadIn - 1;
-      console.log("Lead in is an integer, subtracting 1");
+      // console.log("Lead in is an integer, subtracting 1");
     }
 
     else{
@@ -505,3 +533,5 @@ function calculateSinglePrice(choices) {
     }
     return getPrice_result;
   }
+
+  //Calculate Total Order Price

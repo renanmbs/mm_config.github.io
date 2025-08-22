@@ -277,4 +277,9 @@ details span{
   font-weight: bold;
 }
 
+.span2{
+  text-align: center;
+  font-size: 0.8rem;
+  color: grey;
+}
 
