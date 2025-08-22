@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Monarch Metal MF625 Configurator</title>
+  <link rel="stylesheet" href="./css/stylesheet.css" />
+</head>
+<body>
+
+  <h1>Monarch Metal Z-Clip Configurator</h1>
+  <details>
+    <summary>How to use the configurator:</summary>
+    <ul>
+      <li>To see the results on Google Chrome: 3 dots > More Tools > Developer Tools > Console </li>
+      <li>Fill up the required fields (Company Name, Z Clip Option, Quantity, Length, Spacing)</li>
+      <li>Click "Add to cart" button, check answers on Developer Tools Console tab</li>
+    </ul>
+    <br/>
+    <small>
+        <p>Usability working: Clear button, Clear Company and Project name, Add New Z Clip block, Remove Z Clip block</p>
+        <p><span>Usability yet to be completed: Multi product calculator, "set unique project name" button</span></p>
+      </small>
+  </details>
+
+  <div id="forms">
+    <form id="customerForm">
+      
+      <!-- Company Name -->
+      <div class="input-row">
+        <div class="input-group">
+          <label for="comp_name">Company Name <span class="req">*</span></label>
+
+          <div class="with-reset">
+            <input type="text" id="comp_name" name="comp_name" required />
+            <button type="button" class="reset-field" data-target="comp_name">✕</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Project Name -->
+      <div class="input-row">
+        <div class="input-group">
+          <label for="proj_name">Project Name</label>
+
+          <div class="with-reset">
+            <input type="text" id="proj_name" name="proj_name" />
+            <button type="button" class="reset-field" data-target="proj_name">✕</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Z Clip Options Container -->
+      <div id="user_choice_container">
+        <div class="user_choice1">
+
+          <!-- Z Clip and Quantity -->
+          <div class="input-row">
+            <div class="input-group">
+              <label>Z Clip Options <span class="req">*</span></label>
+
+              <select name="zclip" required>
+                <option selected disabled>Choose An Option</option>
+                <option value="MF625">MF625</option>
+                <option value="MF375">MF375</option>
+                <option value="MF250">MF250</option>
+                <option value="MFSTR-0375">MFSTR-0375</option>
+                <option value="MFSTR-050">MFSTR-050</option>
+                <option value="MFSTR-075">MFSTR-075</option>
+              </select>
+
+            </div>
+
+            <div class="input-group">
+              <label>Quantity <span class="req">*</span></label>
+              <input type="number" name="qnt" min="1" step="1" required />
+            </div>
+          </div>
+
+          <!-- Length -->
+          <div class="input-row">
+
+            <div class="input-group">
+              <label>Length <span class="tooltip" data-tooltip='Spacing must be in 0.25" increment'><span class="req">*</span></span></label>
+              <input type="number" name="len" min="1.5" max="144" step="0.25" placeholder='Choose from 1.5" to 144"' required />
+            </div>
+
+            <div class="input-group">
+              <label>Spacing <span class="tooltip" data-tooltip='Spacing must be in 0.5" increment'><span class="req">*</span></span></label>
+              <input type="number" name="space" min="1" placeholder='Min. 1"'  step="0.5" required />
+            </div>
+
+          </div>
+
+          <!-- Add different hole sizes in the future -->
+
+            <!-- <div class="input-row">
+                <div class="input-group">
+                    <fieldset>
+                        <legend>
+                            Hole Size <span class="tooltip" data-tooltip="New hole size options available in the near future"><span class="req">*</span></span>
+                        </legend>
+                        <div class="hole_radio">
+                            <input type="radio" name="${holeSizeName}" value='0.203"' id="hole_${choiceCount}_0.203" checked />
+                            <label for="hole_${choiceCount}_0.203">0.203"</label>
+                            <input type="radio" name="${holeSizeName}" value='0.5"' id="hole_${choiceCount}_0.203" />
+                            <label for="hole_${choiceCount}_0.203">0.5"</label>
+                            <input type="radio" name="${holeSizeName}" value='0.75"' id="hole_${choiceCount}_0.203" />
+                            <label for="hole_${choiceCount}_0.203">0.75"</label>
+                            <input type="radio" name="${holeSizeName}" value='1"' id="hole_${choiceCount}_0.203" />
+                            <label for="hole_${choiceCount}_0.203">1"</label>
+                        </div>
+                    </fieldset>
+                </div>
+            </div> -->
+
+          <!-- Buttons for options -->
+          <div class="input-row buttons">
+            <button type="button" class="clear-btn">Clear</button>
+            <button type="button" class="remove-btn">Remove This Option</button>
+            <button type="button" class="change-btn">Set Unique Project Name</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Add new option -->
+      <div id="form_but">
+        <button type="button" id="add_choice_btn">Add New Z Clip Option</button>
+      </div>
+
+      <!-- Final submission -->
+      <div id="but">
+        <button type="submit" id="submit_btn">ADD TO CART</button>
+      </div>
+
+    </form>
+  </div>
+
+  <script src="/js/customization.js"></script>
+</body>
+</html>

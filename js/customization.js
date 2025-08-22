@@ -1,0 +1,507 @@
+// UI and UX Components for Z Clip Customization Form
+
+/* NEXT STEPS:
+
+- Fix the Set Unique Project Name
+- Clear all fields button
+- Multi Pricing Calculator
+
+*/
+
+/* CHANGES BETWEEN VERSIONS
+
+- Changes on the length > spacing validation
+- Console logs for debugging
+- Details tab on how to use it
+
+*/
+
+// When the DOM is fully loaded, initialize event listeners and form validation
+document.addEventListener("DOMContentLoaded", () => {
+  const userChoiceContainer = document.getElementById("user_choice_container");
+  const box = document.getElementById("box");
+  const addChoiceBtn = document.getElementById("add_choice_btn");
+  const form = document.getElementById("customerForm");
+
+  // Add event listeners for buttons inside user_choice dynamically (event delegation)
+  userChoiceContainer.addEventListener("click", (e) => {
+
+    if (e.target.classList.contains("clear-btn")) {
+      clearUserChoice(e.target);
+    } 
+    else if (e.target.classList.contains("remove-btn")) {
+      removeUserChoice(e.target);
+    }
+
+    //UNCOMMENT THIS IF YOU WANT TO ENABLE UNIQUE PROJECT NAME
+    // else if (e.target.classList.contains("change-btn")) {
+    //   changeProjectName(e.target);
+    // }
+
+  });
+
+  // Add new user choice options
+  addChoiceBtn.addEventListener("click", () => {
+    addUserChoice();
+  });
+
+  // Handle form submit
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    let isValid = true;
+    const userChoices = userChoiceContainer.querySelectorAll(".user_choice1");
+
+    userChoices.forEach(choice => {
+      const lengthInput = choice.querySelector('input[name="len"]');
+      const lenVal = parseFloat(lengthInput.value);
+
+      if (!isIncrement(lenVal, 1.5, 0.25)) {
+        isValid = false;
+        lengthInput.setCustomValidity("Length must be in 0.25\" increments starting from 1.5\".");
+        lengthInput.reportValidity();
+      } else {
+        lengthInput.setCustomValidity("");
+      }
+
+      const spaceInput = choice.querySelector('input[name="space"]');
+      const spaceVal = parseFloat(spaceInput.value);
+
+      if (!isIncrement(spaceVal, 1, 0.5)) {
+        isValid = false;
+        spaceInput.setCustomValidity("Spacing must be in 0.5\" increments starting from 1\".");
+        spaceInput.reportValidity();
+      } else {
+        spaceInput.setCustomValidity("");
+      }
+
+      // Validate length > spacing (only flag one field)
+      if (!isNaN(lenVal) && !isNaN(spaceVal)) {
+        if (lenVal <= spaceVal) {
+          isValid = false;
+          // Flag spacing as the dependent variable
+          spaceInput.setCustomValidity("Spacing must be smaller than length.");
+          spaceInput.reportValidity();
+          lengthInput.setCustomValidity("");
+        } else {
+          lengthInput.setCustomValidity("");
+          spaceInput.setCustomValidity("");
+        }
+      }
+    });
+
+    if (!isValid) return;
+
+    const data = gatherFormData();
+    // console.log("Form data:", data);
+    alert("Check console for collected data.");
+  });
+
+  // Live validation for length > spacing
+  userChoiceContainer.addEventListener("input", (e) => {
+    const choice = e.target.closest(".user_choice1");
+    if (!choice) return;
+
+    const lengthInput = choice.querySelector('input[name="len"]');
+    const lenVal = parseFloat(lengthInput.value);
+
+    const spaceInput = choice.querySelector('input[name="space"]');
+    const spaceVal = parseFloat(spaceInput.value);
+
+    if (!isNaN(lenVal) && !isNaN(spaceVal)) {
+      if (lenVal <= spaceVal) {
+        // only flag the field being changed
+        if (e.target === lengthInput) {
+          lengthInput.setCustomValidity("Length must be greater than spacing.");
+          spaceInput.setCustomValidity("");
+          lengthInput.reportValidity();
+        } else {
+          spaceInput.setCustomValidity("Spacing must be smaller than length.");
+          lengthInput.setCustomValidity("");
+          spaceInput.reportValidity();
+        }
+      } else {
+        lengthInput.setCustomValidity("");
+        spaceInput.setCustomValidity("");
+      }
+    }
+  });
+
+  // Helper function to check increment step
+  function isIncrement(value, base, step) {
+    const remainder = (value - base) % step;
+    return Math.abs(remainder) < 1e-8;
+  }
+
+  // Clear user choice inputs
+  function clearUserChoice(button) {
+    const block = button.closest(".user_choice1");
+    if (!block) return;
+
+    block.querySelectorAll("input, select").forEach(el => {
+      if (el.tagName === "SELECT") {
+        el.selectedIndex = 0;
+      } else {
+        el.value = "";
+        el.setCustomValidity("");
+      }
+    });
+  }
+
+  // Remove extra Z Clip options
+  function removeUserChoice(button) {
+    const block = button.closest(".user_choice1");
+    if (!block) return;
+
+    const allChoices = userChoiceContainer.querySelectorAll(".user_choice1");
+    if (allChoices.length > 1) {
+      block.remove();
+    } else {
+      alert("At least one Z Clip option must remain.");
+    }
+  }
+
+  // Toggle Unique Project Name field
+  function changeProjectName() {
+    const existing = document.getElementById("unique_proj_name");
+    if (!existing) {
+      const newName = document.createElement("div");
+      newName.classList.add("user_choice1");
+      newName.setAttribute("id", "unique_proj_name_block");
+
+      newName.innerHTML = 
+      `<div class="input-row">
+        <div class="input-group">
+          <label for="unique_proj_name">Unique Project Name <span class="req">*</span></label>
+          <div class="with-reset">
+            <input type="text" id="unique_proj_name" name="unique_proj_name" required />
+            <button type="button" class="reset-field" data-target="unique_proj_name">✕</button>
+          </div>
+        </div>
+      </div>`;
+
+      userChoiceContainer.appendChild(newName);
+
+      newName.querySelector(".reset-field").addEventListener("click", () => {
+        const input = document.getElementById("unique_proj_name");
+        if (input) input.value = "";
+      });
+
+    } else {
+      const block = document.getElementById("unique_proj_name_block");
+      if (block) block.remove();
+    }
+  }
+
+  // Add new user choice block
+  let choiceCount = 0;
+
+  function addUserChoice() {
+    alert("Multi Product usability not finalized yet. Please use the single product options for now.");
+    choiceCount++;
+    const holeSizeGroupName = `hole_size_${choiceCount}`;
+
+    const newChoice = document.createElement("div");
+    newChoice.classList.add("user_choice1");
+    newChoice.innerHTML = `
+      <div class="input-row">
+        <div class="input-group">
+          <label>Z Clip Options <span class="req">*</span></label>
+          <select name="zclip" required>
+            <option selected disabled>Choose An Option</option>
+            <option value="MF625">MF625</option>
+            <option value="MF375">MF375</option>
+            <option value="MF250">MF250</option>
+            <option value="MFSTR-0375">MFSTR-0375</option>
+            <option value="MFSTR-050">MFSTR-050</option>
+            <option value="MFSTR-075">MFSTR-075</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Quantity <span class="req">*</span></label>
+          <input type="number" name="qnt" min="1" required />
+        </div>
+      </div>
+
+      <div class="input-row">
+        <div class="input-group">
+          <label>Length <span class="tooltip" data-tooltip='Spacing must be in 0.25" increment'><span class="req">*</span></span></label>
+          <input type="number" name="len" min="1.5" max="144" step="0.25" placeholder='Choose from 1.5" to 144"' required />
+        </div>
+        <div class="input-group">
+          <label>Spacing <span class="tooltip" data-tooltip='Spacing must be in 0.5" increment'><span class="req">*</span></span></label>
+          <input type="number" name="space" min="1" placeholder='Min. 1"' step="0.5" required />
+        </div>
+      </div>
+
+      <div id="box"></div>
+
+      <div class="input-row buttons">
+        <button type="button" class="clear-btn">Clear</button>
+        <button type="button" class="remove-btn">Remove This Option</button>
+        <button type="button" class="change-btn">Set Unique Project Name</button>
+      </div>
+    `;
+
+    userChoiceContainer.appendChild(newChoice);
+  }
+
+  function gatherFormData() {
+    const companyName = form.querySelector("#comp_name").value.trim();
+    const projectName = form.querySelector("#proj_name").value.trim();
+
+    const choices = [];
+    userChoiceContainer.querySelectorAll(".user_choice1").forEach(choice => {
+      const zclip = choice.querySelector('select[name="zclip"]').value;
+      const quantity = parseInt(choice.querySelector('input[name="qnt"]').value);
+      const length = parseFloat(choice.querySelector('input[name="len"]').value);
+      const spacing = parseFloat(choice.querySelector('input[name="space"]').value);
+
+      choices.push({ zclip, quantity, length, spacing, companyName, projectName });
+    });
+
+    // If same items, different sizes (Multi Product Calculator)
+
+    // If different items (Single Product Calculator)
+
+    // If one item (Single Product Calculator)
+
+    calculateSinglePrice(choices);
+
+    return { companyName, projectName, choices };
+  }
+});
+
+// Reset individual inputs outside DOMContentLoaded
+document.querySelectorAll(".reset-field").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const targetId = btn.getAttribute("data-target");
+    const input = document.getElementById(targetId);
+    if (input) input.value = "";
+  });
+});
+
+
+/*CALCULATIONS*/
+
+// Calculate Lead In and Hole Amount for each choice
+function calculateLeadIn(choices){
+  const choices_holes = [];
+
+  //Calculate lead in and hole amount for each choice
+  for(choices_data of choices){
+
+    // console.log("length: " + choices_data.length + " spacing: " + choices_data.spacing);
+    
+    let leadIn = choices_data.length / choices_data.spacing;
+
+    if(Number.isInteger(leadIn)){
+      leadIn = leadIn - 1;
+      console.log("Lead in is an integer, subtracting 1");
+    }
+
+    else{
+      leadIn = Math.floor(leadIn);
+      // console.log("Lead in is not an integer, rounding down - " + leadIn);
+    }
+
+    let hole_amount = leadIn + 1;
+
+    leadIn = leadIn * choices_data.spacing;
+
+    leadIn = choices_data.length - leadIn;
+
+    let leadInForPiece = leadIn/2;
+
+    if (leadInForPiece < 0.5) {
+      leadInForPiece = 0.5;
+
+      // MAKE SURE THIS IS CORRECT
+      hole_amount = hole_amount - 1;
+
+      // console.log("Lead in for piece is less than 0.5, setting to 0.5");
+    }
+
+    // console.log("Lead In First Part Calculation: " + leadIn);
+    // console.log("Hole amount: " + hole_amount);
+    // console.log("Lead in for piece: " + leadInForPiece);
+    // console.log("______  END OF CHOICE ______");
+
+    choices_holes.push({ hole_amount, leadInForPiece, leadIn});
+
+
+  }
+  return {choices_holes};
+}
+
+// Calculate Single Price
+
+function calculateSinglePrice(choices) {
+  // Run once and get all hole data
+  const { choices_holes } = calculateLeadIn(choices);
+  const choice_info = [];
+
+  // Iterate through each choice and calculate the price
+  for (let [index, choices_data] of choices.entries()) {
+    const { hole_amount, leadInForPiece, leadIn } = choices_holes[index];
+
+    // console.log("______ START OF CHOICE ______");
+
+    // console.log("Choice index:", index);
+    // console.log("Holes per piece:", hole_amount);
+    // console.log("Lead in for piece:", leadInForPiece);
+    // console.log("Lead in:", leadIn);
+
+    // Single Yield Calculation (Part 1)
+    let singleYield;
+    switch (choices_data.length) {
+      case 12: singleYield = 11.875; break;
+      case 18: singleYield = 17.875; break;
+      case 24: singleYield = 23.875; break;
+      case 36: singleYield = 35.875; break;
+      case 48: singleYield = 47.875; break;
+      default: singleYield = choices_data.length + 0.125;
+    }
+    // console.log("Single Yield:", singleYield);
+
+    // Finished Parts per Length (Part 2)
+    let amount_finished_part = 144 / singleYield;
+    if (!Number.isInteger(amount_finished_part)) {
+      amount_finished_part = Math.floor(amount_finished_part);
+      //console.log("Rounded finished parts:", amount_finished_part);
+    }
+
+    // Lengths Needed (Part 3)
+    let lengths_needed = choices_data.quantity / amount_finished_part;
+    if (!Number.isInteger(lengths_needed)) {
+      lengths_needed = Math.ceil(lengths_needed);
+      //console.log("Rounded lengths needed:", lengths_needed);
+    }
+
+    // Quantity Price (Part 4)
+    const quantity_price = getPrice(lengths_needed, choices_data.zclip);
+   // console.log("Price per piece:", quantity_price);
+
+    // Material Price (Part 5)
+    const material_price = (lengths_needed * quantity_price).toFixed(2);
+    //console.log("Material price:", material_price);
+
+    // Cut Charge (Part 6)
+    let cut_charge = 0.25 * choices_data.quantity;
+    if (cut_charge < 25) cut_charge = 25;
+    //console.log("Cut charge:", cut_charge);
+
+    // Holes per piece (Part 7)
+    // Already calculated as hole_amount
+
+    // Total Punch Charge (Part 8)
+    let total_punch_charge = hole_amount * 0.25;
+
+    if(total_punch_charge < 0.55){
+      total_punch_charge = 0.55;
+      //console.log("Total punch charge is less than 0.55, setting to 0.55");
+    }
+
+    else{
+      //console.log("Total punch charge: " + total_punch_charge);
+    }
+
+    let total_punch_job = total_punch_charge * choices_data.quantity;
+    total_punch_job = total_punch_job + 30;
+    total_punch_job = total_punch_job.toFixed(2);
+
+    //console.log("Total punch job: " + total_punch_job);
+
+    // Calculate Total Price (Part 9)
+    let total_price = parseFloat(material_price) + parseFloat(cut_charge) + parseFloat(total_punch_job);
+
+    //console.log(material_price, cut_charge, total_punch_job);
+    total_price = total_price.toFixed(2);
+
+   // console.log("Total price for this choice: " + total_price);
+
+    // Calculate Price per piece (Part 10)
+    let price_per_piece = total_price / choices_data.quantity;
+
+    price_per_piece = price_per_piece.toFixed(2);
+
+    //onsole.log("Price per piece: " + price_per_piece);
+
+    choice_info.push({"Price Per Piece": '$' + price_per_piece, "Total Price": '$' + total_price, "Length": choices_data.length, "Quantity": choices_data.quantity,
+      "Spacing": choices_data.spacing, "Z-Clip Type": choices_data.zclip, "Hole Amount": choices_holes[index].hole_amount, "Lead In For Piece": choices_holes[index].leadInForPiece,
+      "Company Name": choices_data.companyName, "Project Name": choices_data.projectName});
+  }
+
+  console.table(choice_info);
+  console.log("Calculation Result:\n", JSON.stringify(choice_info, null, 2));
+  
+}
+
+// Get price based on quantity and Z clip type
+  function getPrice(quantity, zclip_type) {
+
+    // Database of pricing tiers
+    const pricingTiers_MF625 = [
+      { max: 19,   price: 27.30 },
+      { max: 39,   price: 25.37 },
+      { max: 79,   price: 21.48 },
+      { max: 159,  price: 20.52 },
+      { max: Infinity, price: 20.23 }
+    ];
+
+    const pricingTiers_MF250 = [
+      { max: 19,   price: 30.22 },
+      { max: 39,   price: 28.28 },
+      { max: 79,   price: 24.40 },
+      { max: 159,  price: 23.43 },
+      { max: Infinity, price: 23.14 }
+    ];
+
+    const pricingTiers_MFSTR_050 = [
+      { max: 19,   price: 51.10 },
+      { max: 39,   price: 49.23 },
+      { max: 79,   price: 44.88 },
+      { max: 159,  price: 38.78 },
+      { max: Infinity, price: 36.58 }
+    ];
+
+    const pricingTiers_MFSTR_0375 = [
+      { max: 19,   price: 72.22 },
+      { max: 39,   price: 69.47 },
+      { max: 79,   price: 63.47 },
+      { max: 159,  price: 54.67 },
+      { max: Infinity, price: 51.65 }
+    ];
+
+    const pricingTiers_MFSTR_075 = [
+      { max: 19,   price: 107.69 },
+      { max: 39,   price: 103.62 },
+      { max: 79,   price: 94.66 },
+      { max: 159,  price: 81.57 },
+      { max: Infinity, price: 77.11 }
+    ];
+
+    let getPrice_result;
+
+    switch (zclip_type) {
+      case "MF625":
+        getPrice_result = pricingTiers_MF625.find(tier => quantity <= tier.max).price;
+        break;
+      case "MF375":
+        getPrice_result = pricingTiers_MF625.find(tier => quantity <= tier.max).price;
+        break;
+      case "MF250":
+        getPrice_result = pricingTiers_MF250.find(tier => quantity <= tier.max).price;
+        break;
+      case "MFSTR-050":
+        getPrice_result = pricingTiers_MFSTR_050.find(tier => quantity <= tier.max).price;
+        break;
+      case "MFSTR-0375":
+        getPrice_result = pricingTiers_MFSTR_0375.find(tier => quantity <= tier.max).price;
+        break;
+      case "MFSTR-075":
+        getPrice_result = pricingTiers_MFSTR_075.find(tier => quantity <= tier.max).price;
+        break;
+    }
+    return getPrice_result;
+  }

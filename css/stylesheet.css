@@ -1,0 +1,280 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: sans-serif;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  gap: 2rem;
+}
+
+/* Top switch section */
+#switch {
+  text-align: center;
+}
+
+#switch h1 {
+  margin-bottom: 0.5rem;
+}
+
+#switch a {
+  text-decoration: none;
+  color: black;
+  transition: color 300ms ease;
+}
+
+#switch a:hover {
+  color: red;
+}
+
+/* Form container */
+#forms {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Form styling */
+form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* Grouped row of inputs */
+.input-row {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.input-row2{
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  text-align: left;
+}
+
+.input-group2{
+  display: flex;
+  flex-direction: column;
+}
+
+
+.req {
+  color: red;
+}
+
+/* Each input and label combo */
+.input-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 220px;
+}
+
+label {
+  margin-bottom: 0.4rem;
+  font-weight: bold;
+}
+
+input,
+select {
+  padding: 0.6rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+select {
+  background-color: rgb(249, 249, 250);
+}
+
+option {
+  padding: 0.5rem;
+  background-color: grey;
+  color: white;
+}
+
+/* Buttons container */
+#form_but {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+#form_but button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: lightgrey;
+  color: black;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#form_but button:hover {
+  background-color: grey;
+  color: white;
+}
+
+/* Buttons inside each user_choice1 */
+.user_choice1 .buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.user_choice1 button {
+  background-color: lightgrey;
+  color: black;
+  padding: 0.4rem 1rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.user_choice1 button:hover {
+  background-color: grey;
+  color: white;
+}
+
+/* Final submit button */
+#but {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+#submit_btn {
+  padding: 1rem 8rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: lightgrey;
+  color: black;
+  transition: background-color 0.3s ease;
+}
+
+#submit_btn:hover {
+  background-color: grey;
+  color: white;
+}
+
+.with-reset {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.with-reset input {
+  flex: 1;
+  padding-right: 2rem; /* space for button */
+}
+
+.with-reset .reset-field {
+  position: absolute;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  color: #888;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.tooltip {
+  position: relative;
+  transition: background-color 0.2s ease;
+  text-align: center;
+}
+
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  color: #333;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  width: auto;
+  font-size: 0.90rem;
+  z-index: 100;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+.tooltip:hover::after {
+  opacity: 1;
+}
+
+.with-reset .reset-field:hover {
+  color: red;
+  background-color: transparent;
+}
+
+.hole_radio input[type="radio"] {
+  margin: 1rem 0.25rem 1rem 0.5rem;
+}
+.hole_radio label {
+  font-weight: normal;
+}
+legend{
+  font-weight: bold;
+}
+
+fieldset legend span {
+  font-weight: normal;
+}
+
+label > span[data-tooltip] {
+  font-weight: normal;
+}
+
+details ul{
+  margin: 1.5rem 2rem .5rem 0;
+}
+
+details li{
+  margin: 0.5rem 0rem 0 2rem;
+}
+
+details p{
+  margin: 0.5rem;
+}
+
+details span{
+  color: darkred;
+  font-weight: bold;
+}
+
+
