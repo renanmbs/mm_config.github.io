@@ -433,7 +433,7 @@ function calculateSinglePrice(choices) {
   }
 
   console.table(choice_info);
-  console.log("Calculation Result:\n", JSON.stringify(choice_info, null, 2));
+  console.log(JSON.stringify(choice_info, null, 2));
   
 }
 
