@@ -270,6 +270,7 @@ details li{
 
 details p{
   margin: 0.5rem;
+  border: solid red;
 }
 
 details span{
