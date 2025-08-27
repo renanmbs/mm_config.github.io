@@ -16,6 +16,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const addChoiceBtn = document.getElementById("add_choice_btn");
   const form = document.getElementById("customerForm");
 
+  const clearAllBtn = document.getElementById("clear_all");
+
+clearAllBtn.addEventListener("click", () => {
+  const form = document.getElementById("customerForm");
+  
+  // Reset all inputs in the form
+  form.querySelectorAll("input, select").forEach(el => {
+    if (el.tagName === "SELECT") {
+      el.selectedIndex = 0;
+    } else {
+      el.value = "";
+      el.setCustomValidity(""); // Clear validation errors
+    }
+  });
+  
+  
+});
+
   // Add event listeners for buttons inside user_choice dynamically (event delegation)
   userChoiceContainer.addEventListener("click", (e) => {
 
@@ -25,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
     else if (e.target.classList.contains("remove-btn")) {
       removeUserChoice(e.target);
     }
+
 
     //UNCOMMENT THIS IF YOU WANT TO ENABLE UNIQUE PROJECT NAME
     // else if (e.target.classList.contains("change-btn")) {
@@ -93,8 +112,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const data = gatherFormData();
     // console.log("Form data:", data);
-    alert("Check console for collected data.");
+    // alert("Check console for collected data.");
   });
+
+
 
   // Live validation for length > spacing
   userChoiceContainer.addEventListener("input", (e) => {
@@ -206,7 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let choiceCount = 0;
 
   function addUserChoice() {
-    alert("Multi Product usability not finalized yet. Please use the single product options for now.");
+    // alert("Multi Product usability not finalized yet. Please use the single product options for now.");
     choiceCount++;
     const holeSizeGroupName = `hole_size_${choiceCount}`;
 
@@ -214,9 +235,9 @@ document.addEventListener("DOMContentLoaded", () => {
     newChoice.classList.add("user_choice1");
     newChoice.innerHTML = `
       <div class="input-row">
-        <div class="input-group">
-          <label>Z Clip Options <span class="req">*</span></label>
-           <select name="zclip" id="zclip" required>
+         <div class="input-group">
+              <label for="zclip">Z Clip Options <span class="req">*</span></label>
+              <select id="zclip" name="zclip" class="zclip" required>
                 <option value="" selected disabled>Choose An Option</option>
                 <option value="MF625">MF625</option>
                 <option value="MF375">MF375</option>
@@ -224,24 +245,31 @@ document.addEventListener("DOMContentLoaded", () => {
                 <option value="MFSTR-0375">MFSTR-0375</option>
                 <option value="MFSTR-050">MFSTR-050</option>
                 <option value="MFSTR-075">MFSTR-075</option>
-            </select>
-        </div>
-        <div class="input-group">
-          <label>Quantity <span class="req">*</span></label>
-          <input type="number" name="qnt" min="1" required />
-        </div>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label for="quant">Quantity <span class="req">*</span></label>
+              <input type="number" id="quant" name="quant" min="1" step="1" required />
+            </div>
       </div>
 
       <div class="input-row">
-        <div class="input-group">
-          <label>Length <span class="span2">(Inches)</span><span class="tooltip" data-tooltip='Spacing must be in 0.25" increment'><span class="req">*</span></span></label>
-          <input type="number" name="len" min="1.5" max="144" step="0.25" placeholder='Choose from 1.5" to 144"' required />
-        </div>
-        <div class="input-group">
-          <label>Spacing <span class="span2">(Inches)</span><span class="tooltip" data-tooltip='Spacing must be in 0.5" increment'><span class="req">*</span></span></label>
-          <input type="number" name="space" min="1" placeholder='Min. 1"' step="0.5" required />
-        </div>
-      </div>
+
+            <div class="input-group">
+              <label for="len">Length <span class="span2">(Inches)</span><span class="tooltip"
+                  data-tooltip='Spacing must be in 0.25" increment'><span class="req">*</span></span></label>
+              <input type="number" name="len" min="1.5" max="144" step="0.25" placeholder='Choose from 1.5" to 144"'
+                id="len" required />
+            </div>
+
+            <div class="input-group">
+              <label for="space">Spacing <span class="span2">(Inches)</span><span class="tooltip"
+                  data-tooltip='Spacing must be in 0.5" increment'><span class="req">*</span></span></label>
+              <input type="number" name="space" min="1" placeholder='Min. 1"' step="0.5" required id="space" />
+            </div>
+
+          </div>
 
       <div id="box"></div>
 
@@ -262,7 +290,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const choices = [];
     userChoiceContainer.querySelectorAll(".user_choice1").forEach(choice => {
       const zclip = choice.querySelector('select[name="zclip"]').value;
-      const quantity = parseInt(choice.querySelector('input[name="qnt"]').value);
+      const quantity = parseInt(choice.querySelector('input[name="quant"]').value);
       const length = parseFloat(choice.querySelector('input[name="len"]').value);
       const spacing = parseFloat(choice.querySelector('input[name="space"]').value);
 
@@ -683,7 +711,7 @@ function calculateMultiPrice(choices) {
 
   // Quick calculation that is easier to manipulate for set up charge
   let setup_charge = 30 * choices.length;
-  console.log(setup_charge);
+  // console.log(setup_charge);
 
   // console.log(setup_charge);
 
@@ -816,7 +844,9 @@ function calculateOrder(choices) {
     if (groupItems.length > 1) {
       // Multi calculator → should return numeric total
       group_total = calculateMultiPrice(groupItems);
-    } else {
+    }
+
+    else {
       // Single calculator → wrap single item in array
       group_total = calculateSinglePrice([groupItems[0]]);
     }
@@ -853,7 +883,9 @@ function packParts(parts, stockLength) {
 
         // If remainder is ≤ 6, scrap it and break
         if (remaining <= 6) break;
-      } else {
+      }
+
+      else {
         // Doesn’t fit → try next smaller part
         i++;
       }

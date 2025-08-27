@@ -17,11 +17,12 @@
       <li>To see the results on Google Chrome: 3 dots > More Tools > Developer Tools > Console </li>
       <li>Fill up the required fields (Company Name, Z Clip Option, Quantity, Length, Spacing)</li>
       <li>Click "Add to cart" button, check answers on Developer Tools Console tab</li>
+      <li>To clear the form data, but leave the input boxes, utilize the "Clear All Fields" button</li>
+      <li><small>Obs: To reset everything, please reload the page</small></li>
     </ul>
     <br />
     <small>
-      <p>Usability working: Clear button, Clear Company and Project name, Add New Z Clip block, Remove Z Clip block</p>
-      <p><span>Usability yet to be completed: Multi product calculator, "set unique project name" button</span></p>
+      <p><span>Usability yet to be completed: "set unique project name" button</span></p>
     </small>
   </details>
 
@@ -63,7 +64,7 @@
             <div class="input-group">
               <label for="zclip">Z Clip Options <span class="req">*</span></label>
 
-              <select name="zclip" id="zclip" required>
+              <select id="zclip" name="zclip" class="zclip" required>
                 <option value="" selected disabled>Choose An Option</option>
                 <option value="MF625">MF625</option>
                 <option value="MF375">MF375</option>
@@ -76,7 +77,7 @@
 
             <div class="input-group">
               <label for="quant">Quantity <span class="req">*</span></label>
-              <input type="number" id="quant" name="qnt" min="1" step="1" required />
+              <input type="number" id="quant" name="quant" min="1" step="1" required />
             </div>
           </div>
 
@@ -133,6 +134,7 @@
       <!-- Add new option -->
       <div id="form_but">
         <button type="button" id="add_choice_btn">Add New Z Clip Option</button>
+        <button type="button" id="clear_all">Clear All Fields</button>
       </div>
 
       <!-- Final submission -->

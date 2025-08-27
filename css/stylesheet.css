@@ -116,11 +116,24 @@ option {
   color: white;
 }
 
-/* Buttons container */
 #form_but {
   display: flex;
-  justify-content: center;
-  margin-top: 1rem;
+  flex-direction: column;
+  gap: 0.1px;
+  align-items: center;
+}
+
+#form_but2{
+  display: flex;
+  margin: 0 !important;
+  align-items: center;
+}
+
+#clear_all{
+  background-color: transparent !important;
+  font-size: smaller !important;
+  color:rgb(179, 0, 0) !important;
+  transition: all 0.3s ease, color 0.3s ease;
 }
 
 #form_but button {
@@ -138,6 +151,13 @@ option {
   background-color: grey;
   color: white;
 }
+
+#clear_all:hover{
+  text-decoration: underline;
+  color:black !important;
+  background-color: transparent;
+}
+
 
 /* Buttons inside each user_choice1 */
 .user_choice1 .buttons {
