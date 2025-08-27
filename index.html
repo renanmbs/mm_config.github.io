@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Monarch Metal MF625 Configurator</title>
   <link rel="stylesheet" href="./css/stylesheet.css" />
 </head>
+
 <body>
 
   <h1>Monarch Metal Z-Clip Configurator</h1>
@@ -16,16 +18,16 @@
       <li>Fill up the required fields (Company Name, Z Clip Option, Quantity, Length, Spacing)</li>
       <li>Click "Add to cart" button, check answers on Developer Tools Console tab</li>
     </ul>
-    <br/>
+    <br />
     <small>
-        <p>Usability working: Clear button, Clear Company and Project name, Add New Z Clip block, Remove Z Clip block</p>
-        <p><span>Usability yet to be completed: Multi product calculator, "set unique project name" button</span></p>
-      </small>
+      <p>Usability working: Clear button, Clear Company and Project name, Add New Z Clip block, Remove Z Clip block</p>
+      <p><span>Usability yet to be completed: Multi product calculator, "set unique project name" button</span></p>
+    </small>
   </details>
 
   <div id="forms">
     <form id="customerForm">
-      
+
       <!-- Company Name -->
       <div class="input-row">
         <div class="input-group">
@@ -59,10 +61,10 @@
           <!-- Z Clip and Quantity -->
           <div class="input-row">
             <div class="input-group">
-              <label>Z Clip Options <span class="req">*</span></label>
+              <label for="zclip">Z Clip Options <span class="req">*</span></label>
 
-              <select name="zclip" required>
-                <option selected disabled>Choose An Option</option>
+              <select name="zclip" id="zclip" required>
+                <option value="" selected disabled>Choose An Option</option>
                 <option value="MF625">MF625</option>
                 <option value="MF375">MF375</option>
                 <option value="MF250">MF250</option>
@@ -70,12 +72,11 @@
                 <option value="MFSTR-050">MFSTR-050</option>
                 <option value="MFSTR-075">MFSTR-075</option>
               </select>
-
             </div>
 
             <div class="input-group">
-              <label>Quantity <span class="req">*</span></label>
-              <input type="number" name="qnt" min="1" step="1" required />
+              <label for="quant">Quantity <span class="req">*</span></label>
+              <input type="number" id="quant" name="qnt" min="1" step="1" required />
             </div>
           </div>
 
@@ -83,20 +84,23 @@
           <div class="input-row">
 
             <div class="input-group">
-              <label>Length <span class="span2">(Inches)</span><span class="tooltip" data-tooltip='Spacing must be in 0.25" increment'><span class="req">*</span></span></label>
-              <input type="number" name="len" min="1.5" max="144" step="0.25" placeholder='Choose from 1.5" to 144"' required />
+              <label for="len">Length <span class="span2">(Inches)</span><span class="tooltip"
+                  data-tooltip='Spacing must be in 0.25" increment'><span class="req">*</span></span></label>
+              <input type="number" name="len" min="1.5" max="144" step="0.25" placeholder='Choose from 1.5" to 144"'
+                id="len" required />
             </div>
 
             <div class="input-group">
-              <label>Spacing <span class="span2">(Inches)</span><span class="tooltip" data-tooltip='Spacing must be in 0.5" increment'><span class="req">*</span></span></label>
-              <input type="number" name="space" min="1" placeholder='Min. 1"'  step="0.5" required />
+              <label for="space">Spacing <span class="span2">(Inches)</span><span class="tooltip"
+                  data-tooltip='Spacing must be in 0.5" increment'><span class="req">*</span></span></label>
+              <input type="number" name="space" min="1" placeholder='Min. 1"' step="0.5" required id="space" />
             </div>
 
           </div>
 
           <!-- Add different hole sizes in the future -->
 
-            <!-- <div class="input-row">
+          <!-- <div class="input-row">
                 <div class="input-group">
                     <fieldset>
                         <legend>
@@ -144,4 +148,5 @@
 
   <script src="./js/customization.js"></script>
 </body>
+
 </html>
