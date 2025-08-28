@@ -8,8 +8,6 @@
 
 */
 
-/*CHANGE THE PRICE DATABASE FOR 625!!!!! */
-
 // When the DOM is fully loaded, initialize event listeners and form validation
 document.addEventListener("DOMContentLoaded", () => {
   const userChoiceContainer = document.getElementById("user_choice_container");
@@ -18,21 +16,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const clearAllBtn = document.getElementById("clear_all");
 
-clearAllBtn.addEventListener("click", () => {
-  const form = document.getElementById("customerForm");
-  
-  // Reset all inputs in the form
-  form.querySelectorAll("input, select").forEach(el => {
-    if (el.tagName === "SELECT") {
-      el.selectedIndex = 0;
-    } else {
-      el.value = "";
-      el.setCustomValidity(""); // Clear validation errors
-    }
+  clearAllBtn.addEventListener("click", () => {
+    const form = document.getElementById("customerForm");
+
+    // Reset all inputs in the form
+    form.querySelectorAll("input, select").forEach(el => {
+      if (el.tagName === "SELECT") {
+        el.selectedIndex = 0;
+      } else {
+        el.value = "";
+        el.setCustomValidity(""); // Clear validation errors
+      }
+    });
+
+
   });
-  
-  
-});
 
   // Add event listeners for buttons inside user_choice dynamically (event delegation)
   userChoiceContainer.addEventListener("click", (e) => {
@@ -332,7 +330,7 @@ clearAllBtn.addEventListener("click", () => {
 
     let total = calculateOrder(choices);
 
-    return { companyName, projectName, choices };
+    return { companyName, projectName, total, choices };
   }
 });
 
@@ -544,6 +542,10 @@ function calculateSinglePrice(choices) {
     //CALCULATE TOTAL PRICE
     let total_single = (price_per_piece * choices_data.quantity).toFixed(2);
 
+    //ADD PART NAME
+    let custom_name = name_part(choices_data);
+    console.log(custom_name);
+
     let unsorted_obj_answer = {
       "Price Per Piece": '$' + parseFloat(price_per_piece),
       "Quantity Price": '$' + parseFloat(quantity_price),
@@ -557,16 +559,16 @@ function calculateSinglePrice(choices) {
       "Company Name": choices_data.companyName,
       "Project Name": choices_data.projectName,
       "Price Per Item": '$' + parseFloat(total_single),
-      "Full Lengths For Order": lengths_needed
+      "Full Lengths For Order": lengths_needed,
+      "Custom Part Name": custom_name
     }
 
     choice_info.push(sortObjectKeys(unsorted_obj_answer));
   }
 
   let total_order_price = total_order(choice_info); // sum of all choice prices
-  console.table(choice_info);
-  console.log(JSON.stringify(choice_info, null, 2))
-  console.log("PRICE PER GROUP: $" + total_order_price);
+
+  print_results(choice_info, total_order_price);
 
   return total_order_price; // <- return numeric total
 
@@ -619,7 +621,7 @@ function calculateMultiPrice(choices) {
 
     // Use object so it's easier to handle later
     piece_order_array.push({
-      type: choices_data.zclip,
+      zclip: choices_data.zclip,
       quantity: choices_data.quantity,
       length: choices_data.length,
       spacing: choices_data.spacing,
@@ -654,10 +656,10 @@ function calculateMultiPrice(choices) {
     // Calculate the amount of finished parts per length (part 2)
     let total_length_stock;
     if (choices_data.length < 6) {
-      total_length_stock = 140
+      total_length_stock = 140;
     }
     else {
-      total_length_stock = 144
+      total_length_stock = 144;
     }
     finished_part_length = total_length_stock / singleYield;
 
@@ -677,9 +679,8 @@ function calculateMultiPrice(choices) {
     // console.log("Lengths per item " + lengths_per_item);
 
     // Calculate number of lengths needed to be cut to complete the job (part 4)
-    // total_lengths += lengths_per_item;
-    // Expand order into an array of part lengths
-    // Expand all parts into an array
+
+    //Getting the information for the recursion function to check for drop
     let allParts = [];
     for (let [index, choices_data] of piece_order_array.entries()) {
       for (let q = 0; q < choices_data.quantity; q++) {
@@ -687,8 +688,8 @@ function calculateMultiPrice(choices) {
       }
     }
 
-    const stockLength = 144; // or 140 if <6" part rule
-    total_lengths = packParts(allParts, stockLength);
+    // Check for drops
+    total_lengths = packParts(allParts, total_length_stock);
     // console.log("Total Length " + total_lengths);
 
     total_inches_customer = choices_data.length * choices_data.quantity;
@@ -729,6 +730,7 @@ function calculateMultiPrice(choices) {
 
   // cut_per_item = cut_per_item / choices_data.quantity;
 
+  //Continue calculating the base price per inch, with cut charge
   base_per_inch = ((base_per_inch + cut_per_item) / sum_inches_customer).toFixed(2);
   base_per_inch = parseFloat(base_per_inch);
   // console.log(base_per_inch);
@@ -747,16 +749,6 @@ function calculateMultiPrice(choices) {
       //Do nothing
     }
 
-    // // Calculate Cut Charge per item (Part 9)
-    // if (choices_data.quantity < 100) {
-    //   cut_per_item = 25;
-    // }
-    // else {
-    //   cut_per_item = choices_data.quantity * 0.25;
-    // }
-
-    // cut_per_item = cut_per_item / choices_data.quantity;
-
     //Calculate Per Run Per Inch (Step 10)
     per_run_per_inch = choices_data.length * base_per_inch;
 
@@ -767,6 +759,9 @@ function calculateMultiPrice(choices) {
     //CALCULATE TOTAL PRICE
     let total_single = (per_run_per_inch * choices_data.quantity).toFixed(2);
 
+    //ADD PART NAME
+    let custom_name = name_part(choices_data);
+
     let unsorted_obj_answer = {
       "Price Per Piece": '$' + parseFloat(per_run_per_inch),
       "Quantity Price": '$' + parseFloat(quantity_price),
@@ -774,25 +769,26 @@ function calculateMultiPrice(choices) {
       "Length": parseFloat(choices_data.length),
       "Quantity": parseInt(choices_data.quantity),
       "Spacing": parseFloat(choices_data.spacing),
-      "Z Clip Type": choices_data.type,
+      "Z Clip Type": choices_data.zclip,
       "Hole Amount": parseFloat(choices_holes[index].hole_amount),
       "Lead In For Piece": parseFloat(choices_holes[index].leadInForPiece),
       "Company Name": choices_data.companyName,
       "Project Name": choices_data.projectName,
       "Full Lengths For Order": parseInt(total_lengths),
-      "Price Per Item": '$' + parseFloat(total_single)
+      "Price Per Item": '$' + parseFloat(total_single),
+      "Custom Part Name": custom_name
     }
 
     choice_info.push(sortObjectKeys(unsorted_obj_answer));
   }
 
+  // Calculate total order price
   let total_order_price = total_order(choice_info);
 
   total_order_price = total_order_price.toFixed(2);
 
-  console.table(choice_info);
-  console.log(JSON.stringify(choice_info, null, 2));
-  console.log("Total group price: $" + total_order_price);
+  // Print results for estimators
+  print_results(choice_info, total_order_price);
 
   return total_order_price; // <- return numeric total
 
@@ -825,6 +821,7 @@ function total_order(choices) {
   return total_order;
 }
 
+//Function to calculate multi price and single price
 function calculateOrder(choices) {
   const groups = {};
   let total_order = 0; // sum of all groups
@@ -861,6 +858,7 @@ function calculateOrder(choices) {
   return total_order;
 }
 
+//Recursion function to calculate the lengths needed reutilizing drop
 function packParts(parts, stockLength) {
   // Sort parts descending (largest first, helps efficiency)
   parts.sort((a, b) => b - a);
@@ -893,4 +891,56 @@ function packParts(parts, stockLength) {
   }
 
   return barsUsed;
+}
+
+//Naming part function
+function name_part(choice) {
+  const hole_diameter = .313;
+  //Replace leading 0 from hole diameter
+  const hd = hole_diameter.toString().replace(/^0+/, '');
+
+  let custom_name = `CUS-${choice.zclip}-${choice.length}H${choice.spacing}`;
+
+  //UNCOMMENT THIS WHEN HOLE DIAMETER SHOULD BE CONSIDERED;
+
+  // let custom_name = `CUS-${choice.zclip}-${choice.length}H${choice.spacing}_D${hd}`;
+
+  return custom_name;
+}
+
+
+//Function to print the results
+function print_results(choices_array, price_per_group) {
+
+
+  // const newWindow = window.open('', '_blank');
+  // if (newWindow) {
+  //   const doc = newWindow.document;
+
+  //   // Build document structure
+  //   const html = doc.documentElement;
+  //   const head = doc.head;
+  //   const body = doc.body;
+
+  //   doc.title = "Calculation Results";
+
+  //   const p = doc.createElement('p');
+  //   p.textContent = choices_array;
+
+  //   body.appendChild(h1);
+  //   body.appendChild(p);
+
+  //   // Optional: add some quick styles
+  //   const style = doc.createElement('style');
+  //   style.textContent = `
+  //   body { font-family: sans-serif; padding: 20px; }
+  //   h1 { color: #333; }
+  //   p { font-size: 1.2rem; }
+  // `;
+  //   head.appendChild(style);
+  // }
+
+  console.table(choices_array);
+  console.log(JSON.stringify(choices_array, null, 2));
+  console.log("Total group price: $" + price_per_group);
 }

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Calculation Results</title>
+  <link rel="icon" href="../img/Monarch3Logo.svg">
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    h1 { color: #333; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f4f4f4; }
+  </style>
+</head>
+<body>
+  <h1>Calculation Results</h1>
+  <p id="total"></p>
+  <table id="resultsTable"></table>
+
+  <script>
+    // Grab the results from localStorage
+    const data = JSON.parse(localStorage.getItem("calc_results") || "{}");
+
+    if (data.choices_array && data.choices_array.length > 0) {
+      // Show total
+      document.getElementById("total").textContent =
+        "Total group price: $" + data.price_per_group;
+
+      // Build table
+      const table = document.getElementById("resultsTable");
+      const headers = Object.keys(data.choices_array[0]);
+
+      // Header row
+      let thead = "<tr>" + headers.map(h => `<th>${h}</th>`).join("") + "</tr>";
+
+      // Data rows
+      let rows = data.choices_array.map(obj =>
+        "<tr>" + headers.map(h => `<td>${obj[h]}</td>`).join("") + "</tr>"
+      ).join("");
+
+      table.innerHTML = thead + rows;
+    } else {
+      document.body.innerHTML += "<p>No results found.</p>";
+    }
+  </script>
+</body>
+</html>
