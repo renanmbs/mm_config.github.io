@@ -119,7 +119,7 @@ option {
 #form_but {
   display: flex;
   flex-direction: column;
-  gap: 0.1px;
+  gap: 0.8rem;
   align-items: center;
 }
 

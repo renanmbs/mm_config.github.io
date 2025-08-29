@@ -8,6 +8,14 @@
 
 */
 
+/*
+PRINT RESULTS:
+
+- ONE PRODUCT - WORKS
+- ONE PRODUCT, MULTIPLE ITEMS - WORKS
+- MULTIPLE ITEMS, MULTIPLE PRODUCTS - DOESN'T WORK
+*/ 
+
 // When the DOM is fully loaded, initialize event listeners and form validation
 document.addEventListener("DOMContentLoaded", () => {
   const userChoiceContainer = document.getElementById("user_choice_container");
@@ -544,26 +552,29 @@ function calculateSinglePrice(choices) {
 
     //ADD PART NAME
     let custom_name = name_part(choices_data);
-    console.log(custom_name);
+    // console.log(custom_name);
 
     let unsorted_obj_answer = {
-      "Price Per Piece": '$' + parseFloat(price_per_piece),
-      "Quantity Price": '$' + parseFloat(quantity_price),
-      "Total Price": '$' + parseFloat(total_price),
+      "Company Name": choices_data.companyName,
+      "Project Name": choices_data.projectName,
+      "Custom Part Name": custom_name,
+      "Z Clip Type": choices_data.zclip,
+      "Lead In For Piece": parseFloat(choices_holes[index].leadInForPiece),
+      "Full Lengths Needed": lengths_needed,
       "Length": parseFloat(choices_data.length),
       "Quantity": parseInt(choices_data.quantity),
       "Spacing": parseFloat(choices_data.spacing),
-      "Z Clip Type": choices_data.zclip,
       "Hole Amount": parseInt(choices_holes[index].hole_amount),
-      "Lead In For Piece": parseFloat(choices_holes[index].leadInForPiece),
-      "Company Name": choices_data.companyName,
-      "Project Name": choices_data.projectName,
       "Price Per Item": '$' + parseFloat(total_single),
-      "Full Lengths For Order": lengths_needed,
-      "Custom Part Name": custom_name
+      "Price Per Piece": '$' + parseFloat(price_per_piece),
+      "Quantity Price": '$' + parseFloat(quantity_price),
+      // "Total Price": '$' + parseFloat(total_price),
+      //BASE PRICE PER INCH?
     }
 
-    choice_info.push(sortObjectKeys(unsorted_obj_answer));
+    choice_info.push(unsorted_obj_answer);
+    console.log('Here');
+  console.log(unsorted_obj_answer);
   }
 
   let total_order_price = total_order(choice_info); // sum of all choice prices
@@ -763,23 +774,26 @@ function calculateMultiPrice(choices) {
     let custom_name = name_part(choices_data);
 
     let unsorted_obj_answer = {
-      "Price Per Piece": '$' + parseFloat(per_run_per_inch),
-      "Quantity Price": '$' + parseFloat(quantity_price),
-      "Base Price Per Inch": '$' + parseFloat(base_per_inch),
+      "Company Name": choices_data.companyName,
+      "Project Name": choices_data.projectName,
+      "Custom Part Name": custom_name,
+      "Z Clip Type": choices_data.zclip,
+      "Lead In For Piece": parseFloat(choices_holes[index].leadInForPiece),
+      "Full Lengths Needed": parseInt(total_lengths),
       "Length": parseFloat(choices_data.length),
       "Quantity": parseInt(choices_data.quantity),
       "Spacing": parseFloat(choices_data.spacing),
-      "Z Clip Type": choices_data.zclip,
+      "Base Price Per Inch": '$' + parseFloat(base_per_inch),
       "Hole Amount": parseFloat(choices_holes[index].hole_amount),
-      "Lead In For Piece": parseFloat(choices_holes[index].leadInForPiece),
-      "Company Name": choices_data.companyName,
-      "Project Name": choices_data.projectName,
-      "Full Lengths For Order": parseInt(total_lengths),
       "Price Per Item": '$' + parseFloat(total_single),
-      "Custom Part Name": custom_name
+      "Price Per Piece": '$' + parseFloat(per_run_per_inch),
+      "Quantity Price": '$' + parseFloat(quantity_price),
     }
 
-    choice_info.push(sortObjectKeys(unsorted_obj_answer));
+    console.log('Here');
+    console.log(unsorted_obj_answer);
+
+    choice_info.push(unsorted_obj_answer);
   }
 
   // Calculate total order price
@@ -853,6 +867,7 @@ function calculateOrder(choices) {
 
     total_order = total_order.toFixed(2);
   }
+
   console.log("__________________");
   console.log("TOTAL ORDER: $", total_order);
   return total_order;
@@ -902,45 +917,35 @@ function name_part(choice) {
   let custom_name = `CUS-${choice.zclip}-${choice.length}H${choice.spacing}`;
 
   //UNCOMMENT THIS WHEN HOLE DIAMETER SHOULD BE CONSIDERED;
-
   // let custom_name = `CUS-${choice.zclip}-${choice.length}H${choice.spacing}_D${hd}`;
 
   return custom_name;
 }
 
+//Function to add both single and multi results into the same container
+let array = [];
+function gatherdata(choice) {
+  array.push({ choice, "Price per group": parseFloat(price_per_group) });
+
+  print_results(array,price_per_group);
+}
+
+
 
 //Function to print the results
-function print_results(choices_array, price_per_group) {
+function print_results(results_array, total_order_price) {
+  // Save results into localStorage
 
 
-  // const newWindow = window.open('', '_blank');
-  // if (newWindow) {
-  //   const doc = newWindow.document;
+  const data = {
+    price_per_group: total_order_price,
+    choices_array: results_array
+  };
 
-  //   // Build document structure
-  //   const html = doc.documentElement;
-  //   const head = doc.head;
-  //   const body = doc.body;
+  console.log(data);
 
-  //   doc.title = "Calculation Results";
+  localStorage.setItem("calc_results", JSON.stringify(data));
 
-  //   const p = doc.createElement('p');
-  //   p.textContent = choices_array;
-
-  //   body.appendChild(h1);
-  //   body.appendChild(p);
-
-  //   // Optional: add some quick styles
-  //   const style = doc.createElement('style');
-  //   style.textContent = `
-  //   body { font-family: sans-serif; padding: 20px; }
-  //   h1 { color: #333; }
-  //   p { font-size: 1.2rem; }
-  // `;
-  //   head.appendChild(style);
-  // }
-
-  console.table(choices_array);
-  console.log(JSON.stringify(choices_array, null, 2));
-  console.log("Total group price: $" + price_per_group);
+  // Open the results page in new tab
+  window.open("./html/calculation_results.html", "_blank");
 }
