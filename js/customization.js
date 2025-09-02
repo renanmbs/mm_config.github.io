@@ -292,7 +292,6 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="input-row buttons">
         <button type="button" class="clear-btn">Clear</button>
         <button type="button" class="remove-btn">Remove This Option</button>
-        <button type="button" class="change-btn">Set Unique Project Name</button>
       </div>
     `;
 
@@ -405,73 +404,52 @@ const pricingTiers_MFSTR_075 = [
   { max: Infinity, price: 77.11 }
 ];
 
-// Calculate Lead In and Hole Amount for each choice
-function calculateLeadIn(choices) {
-  const choices_holes = [];
-
-  //Calculate lead in and hole amount for each choice
-  for (choices_data of choices) {
-
-    // console.log("length: " + choices_data.length + " spacing: " + choices_data.spacing);
-
-    let leadIn = choices_data.length / choices_data.spacing;
-
-    if (Number.isInteger(leadIn)) {
-      leadIn = leadIn - 1;
-      // console.log("Lead in is an integer, subtracting 1");
-    }
-
-    else {
-      leadIn = Math.floor(leadIn);
-      // console.log("Lead in is not an integer, rounding down - " + leadIn);
-    }
-
-    let hole_amount = leadIn + 1;
-
-    leadIn = leadIn * choices_data.spacing;
-
-    leadIn = choices_data.length - leadIn;
-
-    let leadInForPiece = leadIn / 2;
-
-    if (leadInForPiece < 0.5) {
-      leadInForPiece = 0.5;
-
-      // MAKE SURE THIS IS CORRECT
-      hole_amount = hole_amount - 1;
-
-      // console.log("Lead in for piece is less than 0.5, setting to 0.5");
-    }
-
-    // console.log("Lead In First Part Calculation: " + leadIn);
-    // console.log("Hole amount: " + hole_amount);
-    // console.log("Lead in for piece: " + leadInForPiece);
-    // console.log("______  END OF CHOICE ______");
-
-    choices_holes.push({ hole_amount, leadInForPiece, leadIn });
-
-    console.log(choices_holes);
+function computeHoleData(length, spacing) {
+  // holesBetween = number of spacings that actually fit strictly inside the length
+  let holesBetween = Math.floor(length / spacing);
+  if (Number.isInteger(length / spacing)) {
+    // if spacing divides length exactly, there is one less interior spacing
+    holesBetween -= 1;
   }
+
+  // total holes = interior spacings + 1
+  let hole_amount = holesBetween + 1;
+
+  // total lead-in leftover across both ends
+  const totalLeadIn = length - (holesBetween * spacing);
+  let leadInForPiece = totalLeadIn / 2;
+
+  // enforce 0.5" minimum lead-in each end; if we bump, we must remove one hole
+  if (leadInForPiece < 0.5) {
+    leadInForPiece = 0.5;
+    hole_amount -= 1;
+  }
+
+  return {
+    hole_amount,
+    leadInForPiece,
+    leadIn: totalLeadIn, // total for both ends (you were logging this)
+  };
+}
+
+
+// Calculate Lead In and Hole Amount for each choice
+// --- REPLACE calculateLeadIn with this thin wrapper (optional) ---
+function calculateLeadIn(choices) {
+  const choices_holes = choices.map(c => computeHoleData(c.length, c.spacing));
   return { choices_holes };
 }
 
 // Calculate Single Price
 
 function calculateSinglePrice(choices) {
-  // Run once and get all hole data
-  const { choices_holes } = calculateLeadIn(choices);
   const choice_info = [];
 
-  // Iterate through each choice and calculate the price
-  for (let [index, choices_data] of choices.entries()) {
-    const { hole_amount, leadInForPiece, leadIn } = choices_holes[index];
-
-    // console.log("______ START OF CHOICE ______");
-
-    // console.log("Choice index:", index);
-    // console.log("Holes per piece:", hole_amount);
-    // console.log("Lead in for piece:", leadInForPiece);
-    // console.log("Lead in:", leadIn);
+  for (const choices_data of choices) {
+    const { hole_amount, leadInForPiece, leadIn } = computeHoleData(
+      choices_data.length,
+      choices_data.spacing
+    );
 
     // Single Yield Calculation (Part 1)
     let singleYield;
@@ -483,116 +461,65 @@ function calculateSinglePrice(choices) {
       case 48: singleYield = 47.875; break;
       default: singleYield = choices_data.length + 0.125;
     }
-    // console.log("Single Yield:", singleYield);
 
     // Finished Parts per Length (Part 2)
-    let total_length_stock;
-    if (choices_data.length < 6) {
-      total_length_stock = 140
-    }
-    else {
-      total_length_stock = 144
-    }
-
-    let amount_finished_part = total_length_stock / singleYield;
-    if (!Number.isInteger(amount_finished_part)) {
-      amount_finished_part = Math.floor(amount_finished_part);
-      //console.log("Rounded finished parts:", amount_finished_part);
-    }
+    const total_length_stock = choices_data.length < 6 ? 140 : 144;
+    let amount_finished_part = Math.floor(total_length_stock / singleYield);
 
     // Lengths Needed (Part 3)
-    let lengths_needed = choices_data.quantity / amount_finished_part;
-    if (!Number.isInteger(lengths_needed)) {
-      lengths_needed = Math.ceil(lengths_needed);
-      // console.log("Rounded lengths needed:", lengths_needed);
-    }
+    let lengths_needed = Math.ceil(choices_data.quantity / amount_finished_part);
 
     // Quantity Price (Part 4)
     const quantity_price = getPrice(lengths_needed, choices_data.zclip);
-    // console.log("Price per piece:", quantity_price);
 
     // Material Price (Part 5)
-    const material_price = (lengths_needed * quantity_price).toFixed(2);
-    //console.log("Material price:", material_price);
+    const material_price = (lengths_needed * quantity_price);
 
     // Cut Charge (Part 6)
     let cut_charge = 0.25 * choices_data.quantity;
     if (cut_charge < 25) cut_charge = 25;
-    //console.log("Cut charge:", cut_charge);
-
-    // Holes per piece (Part 7)
-    // Already calculated as hole_amount
 
     // Total Punch Charge (Part 8)
     let total_punch_charge = hole_amount * 0.25;
+    if (total_punch_charge < 0.55) total_punch_charge = 0.55;
 
-    if (total_punch_charge < 0.55) {
-      total_punch_charge = 0.55;
-      //console.log("Total punch charge is less than 0.55, setting to 0.55");
-    }
+    let total_punch_job = (total_punch_charge * choices_data.quantity) + 30;
 
-    else {
-      //Do nothing
-      //console.log("Total punch charge: " + total_punch_charge);
-    }
+    // Total Price (Part 9)
+    let total_price = material_price + cut_charge + total_punch_job;
 
-    let total_punch_job = total_punch_charge * choices_data.quantity;
-    total_punch_job = total_punch_job + 30;
-    total_punch_job = total_punch_job.toFixed(2);
-
-    //console.log("Total punch job: " + total_punch_job);
-
-    // Calculate Total Price (Part 9)
-    let total_price = parseFloat(material_price) + parseFloat(cut_charge) + parseFloat(total_punch_job);
-
-    //console.log(material_price, cut_charge, total_punch_job);
-    total_price = total_price.toFixed(2);
-
-    // console.log("Total price for this choice: " + total_price);
-
-    // Calculate Price per piece (Part 10)
+    // Price per piece (Part 10)
     let price_per_piece = total_price / choices_data.quantity;
 
-    price_per_piece = price_per_piece.toFixed(2);
-
-    //console.log("Price per piece: " + price_per_piece);
-
     //CALCULATE TOTAL PRICE
-    let total_single = (price_per_piece * choices_data.quantity).toFixed(2);
+    let total_single = price_per_piece * choices_data.quantity;
 
     //ADD PART NAME
     let custom_name = name_part(choices_data);
-    // console.log(custom_name);
 
     let unsorted_obj_answer = {
-      "Company Name": choices_data.companyName,
-      "Project Name": choices_data.projectName,
+      "Company Name": capitalizeFirstLetter(choices_data.companyName),
+      "Project Name": capitalizeFirstLetter(choices_data.projectName),
       "Custom Part Name": custom_name,
       "Z Clip Type": choices_data.zclip,
-      "Lead In For Piece": parseFloat(choices_holes[index].leadInForPiece),
+      "Lead In For Piece": parseFloat(leadInForPiece),
       "Quantity": parseInt(choices_data.quantity),
       "Full Lengths Needed": lengths_needed,
       "Length": parseFloat(choices_data.length),
       "Spacing": parseFloat(choices_data.spacing),
-      "Hole Amount": parseInt(choices_holes[index].hole_amount),
-      "Price Per Item": '$' + parseFloat(total_single),
-      "Price Per Piece": '$' + parseFloat(price_per_piece),
-      "Quantity Price": '$' + parseFloat(quantity_price),
-      // "Total Price": '$' + parseFloat(total_price),
-      //BASE PRICE PER INCH?
-    }
+      "Hole Amount": parseInt(hole_amount),
+      "Base Price Per Inch": "Not calculated for single price items",
+      "Price Per Item": '$' + parseFloat(total_single.toFixed(2)),
+      "Price Per Piece": '$' + parseFloat(price_per_piece.toFixed(2)),
+      "Quantity Price": '$' + parseFloat(quantity_price)
+    };
 
     choice_info.push(unsorted_obj_answer);
-    console.log('Here');
-    console.log(unsorted_obj_answer);
   }
 
-  let total_order_price = total_order(choice_info); // sum of all choice prices
-
-  print_results(choice_info, total_order_price);
-
-  return total_order_price; // <- return numeric total
-
+  let total_order_price = total_order(choice_info);
+  //DO SOMETHING WITH TOTAL ORDER PRICE
+  return choice_info;
 }
 
 // Get price based on quantity and Z clip type
@@ -625,198 +552,108 @@ function getPrice(quantity, zclip_type) {
   return getPrice_result;
 }
 
+function capitalizeFirstLetter(string) {
+  if (typeof string !== 'string' || string.length === 0) {
+    return string; // Handle non-string input or empty strings
+  }
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 // Calculate Multiple Items Price
 function calculateMultiPrice(choices) {
-  // Calculate lead in and choice amount
-  const { choices_holes } = calculateLeadIn(choices);
-  const piece_order_array = [];
-  let choice_info = [];
-  let quantity_price;
-  let base_per_inch;
-  let total_lengths = 0;
-  let sum_inches_customer = 0;
-
-  // Iterate through options
-  for (let [index, choices_data] of choices.entries()) {
-    const { hole_amount, leadInForPiece } = choices_holes[index];
-
-    // Use object so it's easier to handle later
-    piece_order_array.push({
-      zclip: choices_data.zclip,
-      quantity: choices_data.quantity,
-      length: choices_data.length,
-      spacing: choices_data.spacing,
-      companyName: choices_data.companyName,
-      projectName: choices_data.projectName,
-      hole_amount,
-      leadInForPiece
-    });
-  }
+  // Build objects with computed hole data attached BEFORE sorting
+  const piece_order_array = choices.map(c => {
+    const hd = computeHoleData(c.length, c.spacing);
+    return {
+      zclip: c.zclip,
+      quantity: c.quantity,
+      length: c.length,
+      spacing: c.spacing,
+      companyName: c.companyName,
+      projectName: c.projectName,
+      hole_amount: hd.hole_amount,
+      leadInForPiece: hd.leadInForPiece,
+    };
+  });
 
   // Sort by length from largest to smallest (step 1)
   piece_order_array.sort((a, b) => b.length - a.length);
 
-  // Loop through choices 
-  for (let [index, choices_data] of piece_order_array.entries()) {
-    let singleYield;
-    let finished_part_length;
-    let lengths_per_item;
-    let total_inches_customer;
+  let total_lengths = 0;
+  let sum_inches_customer = 0;
 
-    // Calculate yield
-    switch (choices_data.length) {
-      case 12: singleYield = 11.875; break;
-      case 18: singleYield = 17.875; break;
-      case 24: singleYield = 23.875; break;
-      case 36: singleYield = 35.875; break;
-      case 48: singleYield = 47.875; break;
-      default: singleYield = choices_data.length + 0.125;
-      // default: singleYield = choices_data.length;
+  // Compute packing and inches
+  const total_length_stock = piece_order_array.length && piece_order_array[0].length < 6 ? 140 : 144;
+
+  // Build list of all parts for packing
+  const allParts = [];
+  for (const item of piece_order_array) {
+    for (let q = 0; q < item.quantity; q++) {
+      allParts.push(item.length);
     }
-
-    // Calculate the amount of finished parts per length (part 2)
-    let total_length_stock;
-    if (choices_data.length < 6) {
-      total_length_stock = 140;
-    }
-    else {
-      total_length_stock = 144;
-    }
-    finished_part_length = total_length_stock / singleYield;
-
-    if (!Number.isInteger(finished_part_length)) {
-      // console.log("Number not integer, rounding down " + finished_part_length);
-      finished_part_length = Math.floor(finished_part_length);
-    }
-
-    // Calculate Number of lengths needed per item (part 3)
-    lengths_per_item = choices_data.quantity / finished_part_length;
-
-    if (!Number.isInteger(lengths_per_item)) {
-      // console.log("Number not integer, rounding up " + lengths_per_item);
-      lengths_per_item = Math.ceil(lengths_per_item);
-    }
-
-    // console.log("Lengths per item " + lengths_per_item);
-
-    // Calculate number of lengths needed to be cut to complete the job (part 4)
-
-    //Getting the information for the recursion function to check for drop
-    let allParts = [];
-    for (let [index, choices_data] of piece_order_array.entries()) {
-      for (let q = 0; q < choices_data.quantity; q++) {
-        allParts.push(choices_data.length);
-      }
-    }
-
-    // Check for drops
-    total_lengths = packParts(allParts, total_length_stock);
-    // console.log("Total Length " + total_lengths);
-
-    total_inches_customer = choices_data.length * choices_data.quantity;
-
-    // Determine total inches the customer is purchasing (part 5)
-    sum_inches_customer += total_inches_customer;
-
-    // console.log(total_inches_customer)
-
+    sum_inches_customer += item.length * item.quantity;
   }
-  // console.log("Total: " + total_lengths + ' ZClip: ' + choices_data.zclip);
 
-  // Calculate quantity price (part 6)
+  total_lengths = packParts(allParts, total_length_stock);
+
+  // Quantity price (part 6)
   const groupType = choices[0]?.zclip;
-  quantity_price = getPrice(total_lengths, groupType);
+  const quantity_price = getPrice(total_lengths, groupType);
 
-  // Calculate base price per inch (part 7)
-  base_per_inch = quantity_price * total_lengths;
-  // console.log(base_per_inch);
+  // Setup charge (quick calc)
+  const setup_charge = 30 * piece_order_array.length;
 
-  // Quick calculation that is easier to manipulate for set up charge
-  let setup_charge = 30 * choices.length;
-  // console.log(setup_charge);
-
-  // console.log(setup_charge);
-
-  base_per_inch = (base_per_inch + setup_charge).toFixed(2);
-  base_per_inch = parseFloat(base_per_inch);
-  // console.log(base_per_inch);
-
-  // Calculate Cut Charge per item (Part 9)
-  if (choices_data.quantity < 100) {
-    cut_per_item = 25;
-  }
-  else {
-    cut_per_item = choices_data.quantity * 0.25;
+  // Cut charge across the group (fixing the out-of-scope bug)
+  let cut_charge_total = 0;
+  for (const item of piece_order_array) {
+    cut_charge_total += Math.max(25, item.quantity * 0.25);
   }
 
-  // cut_per_item = cut_per_item / choices_data.quantity;
+  // Base price per inch
+  let base_pool = (quantity_price * total_lengths) + setup_charge + cut_charge_total;
+  let base_per_inch = parseFloat((base_pool / sum_inches_customer).toFixed(2));
 
-  //Continue calculating the base price per inch, with cut charge
-  base_per_inch = ((base_per_inch + cut_per_item) / sum_inches_customer).toFixed(2);
-  base_per_inch = parseFloat(base_per_inch);
-  // console.log(base_per_inch);
+  const choice_info = [];
 
-  for (let [index, choices_data] of piece_order_array.entries()) {
-    let cut_per_item;
-    let per_run_per_inch;
+  // Per-item prices
+  for (const item of piece_order_array) {
+    // Punch charge per item
+    let punch_charge = item.hole_amount * 0.25;
+    if (punch_charge < 0.55) punch_charge = 0.55;
 
-    // Calculate Punch Charge Per Item (Part 8)
-    let punch_charge = choices_data.hole_amount * 0.25;
+    // Per run per inch
+    let per_run_per_inch = (item.length * base_per_inch) + punch_charge;
+    per_run_per_inch = parseFloat(per_run_per_inch.toFixed(2));
 
-    if (punch_charge < 0.55) {
-      punch_charge = 0.55;
-    }
-    else {
-      //Do nothing
-    }
+    // Total price for that line
+    let total_single = parseFloat((per_run_per_inch * item.quantity).toFixed(2));
 
-    //Calculate Per Run Per Inch (Step 10)
-    per_run_per_inch = choices_data.length * base_per_inch;
-
-    per_run_per_inch = (per_run_per_inch + punch_charge).toFixed(2);
-
-    // console.log(per_run_per_inch);
-
-    //CALCULATE TOTAL PRICE
-    let total_single = (per_run_per_inch * choices_data.quantity).toFixed(2);
-
-    //ADD PART NAME
-    let custom_name = name_part(choices_data);
+    // Name
+    let custom_name = name_part(item);
 
     let unsorted_obj_answer = {
-      "Company Name": choices_data.companyName,
-      "Project Name": choices_data.projectName,
+      "Company Name": capitalizeFirstLetter(item.companyName),
+      "Project Name": capitalizeFirstLetter(item.projectName),
       "Custom Part Name": custom_name,
-      "Z Clip Type": choices_data.zclip,
-      "Lead In For Piece": parseFloat(choices_holes[index].leadInForPiece),
-      "Quantity": parseInt(choices_data.quantity),
+      "Z Clip Type": item.zclip,
+      "Lead In For Piece": parseFloat(item.leadInForPiece),
+      "Quantity": parseInt(item.quantity),
       "Full Lengths Needed": parseInt(total_lengths),
-      "Length": parseFloat(choices_data.length),
-      "Spacing": parseFloat(choices_data.spacing),
-      "Base Price Per Inch": '$' + parseFloat(base_per_inch),
-      "Hole Amount": parseFloat(choices_holes[index].hole_amount),
-      "Price Per Item": '$' + parseFloat(total_single),
-      "Price Per Piece": '$' + parseFloat(per_run_per_inch),
+      "Length": parseFloat(item.length),
+      "Spacing": parseFloat(item.spacing),
+      "Hole Amount": parseInt(item.hole_amount),
+      "Base Price Per Inch": '$' + base_per_inch,
+      "Price Per Item": '$' + total_single,
+      "Price Per Piece": '$' + per_run_per_inch,
       "Quantity Price": '$' + parseFloat(quantity_price),
-    }
-
-    console.log('Here');
-    console.log(unsorted_obj_answer);
+    };
 
     choice_info.push(unsorted_obj_answer);
   }
 
-  // Calculate total order price
-  let total_order_price = total_order(choice_info);
-
-  total_order_price = total_order_price.toFixed(2);
-
-  // Print results for estimators
-  print_results(choice_info, total_order_price);
-
-  return total_order_price; // <- return numeric total
-
-  // return choice_info;
+  let total_order_price = total_order(choice_info).toFixed(2);
+  //DO SOMETHING WITH TOTAL ORDER PRICE
+  return choice_info;
 }
 
 // Sort alphabetically the object
@@ -848,39 +685,29 @@ function total_order(choices) {
 //Function to calculate multi price and single price
 function calculateOrder(choices) {
   const groups = {};
-  let total_order = 0; // sum of all groups
+  let grand_total = 0;
+  const all_results = [];
 
-  // Group items by zclip type
   for (const item of choices) {
     if (!groups[item.zclip]) groups[item.zclip] = [];
     groups[item.zclip].push(item);
   }
 
-  // Loop over each group
   for (const type in groups) {
-    const groupItems = groups[type];
-
-    let group_total = 0;
-
-    if (groupItems.length > 1) {
-      // Multi calculator → should return numeric total
-      group_total = calculateMultiPrice(groupItems);
+    let group_results;
+    if (groups[type].length > 1) {
+      group_results = calculateMultiPrice(groups[type]);
+    } else {
+      group_results = calculateSinglePrice(groups[type]);
     }
 
-    else {
-      // Single calculator → wrap single item in array
-      group_total = calculateSinglePrice([groupItems[0]]);
-    }
-
-    // Add this group's total to the overall total
-    total_order = parseFloat(total_order) + parseFloat(group_total);
-
-    total_order = total_order.toFixed(2);
+    all_results.push(...group_results);
+    grand_total += total_order(group_results);
   }
 
-  console.log("__________________");
-  console.log("TOTAL ORDER: $", total_order);
-  return total_order;
+  // ONE CALL — prints the full merged dataset
+  print_results(all_results, grand_total.toFixed(2));
+  return grand_total;
 }
 
 //Recursion function to calculate the lengths needed reutilizing drop
@@ -933,29 +760,22 @@ function name_part(choice) {
 }
 
 //Function to add both single and multi results into the same container
-let array = [];
-function gatherdata(choice) {
-  array.push({ choice, "Price per group": parseFloat(price_per_group) });
+// let array = [];
+// function gatherdata(choice) {
+//   array.push({ choice, "Price per group": parseFloat(price_per_group) });
 
-  print_results(array,price_per_group);
-}
+//   print_results(array,price_per_group);
+// }
 
 
 
 //Function to print the results
 function print_results(results_array, total_order_price) {
-  // Save results into localStorage
-
-
   const data = {
     price_per_group: total_order_price,
     choices_array: results_array
   };
 
-  console.log(data);
-
   localStorage.setItem("calc_results", JSON.stringify(data));
-
-  // Open the results page in new tab
   window.open("./html/calculation_results.html", "_blank");
 }

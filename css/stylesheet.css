@@ -13,6 +13,11 @@ body {
   align-items: center;
   padding: 2rem;
   gap: 2rem;
+  background-image: url("../img/Monarch3Logo.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain; 
+  background-attachment: fixed; 
 }
 
 /* Top switch section */
