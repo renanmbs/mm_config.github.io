@@ -16,6 +16,16 @@ PRINT RESULTS:
 - MULTIPLE ITEMS, MULTIPLE PRODUCTS - DOESN'T WORK
 */ 
 
+/*
+
+TO DO:
+
+- Solve multiple items, multiple products printing fix
+- Check wrong hole amount (see image)
+- Fix hole amount display
+
+*/
+
 // When the DOM is fully loaded, initialize event listeners and form validation
 document.addEventListener("DOMContentLoaded", () => {
   const userChoiceContainer = document.getElementById("user_choice_container");
@@ -440,7 +450,7 @@ function calculateLeadIn(choices) {
 
     choices_holes.push({ hole_amount, leadInForPiece, leadIn });
 
-
+    console.log(choices_holes);
   }
   return { choices_holes };
 }
@@ -560,9 +570,9 @@ function calculateSinglePrice(choices) {
       "Custom Part Name": custom_name,
       "Z Clip Type": choices_data.zclip,
       "Lead In For Piece": parseFloat(choices_holes[index].leadInForPiece),
+      "Quantity": parseInt(choices_data.quantity),
       "Full Lengths Needed": lengths_needed,
       "Length": parseFloat(choices_data.length),
-      "Quantity": parseInt(choices_data.quantity),
       "Spacing": parseFloat(choices_data.spacing),
       "Hole Amount": parseInt(choices_holes[index].hole_amount),
       "Price Per Item": '$' + parseFloat(total_single),
@@ -574,7 +584,7 @@ function calculateSinglePrice(choices) {
 
     choice_info.push(unsorted_obj_answer);
     console.log('Here');
-  console.log(unsorted_obj_answer);
+    console.log(unsorted_obj_answer);
   }
 
   let total_order_price = total_order(choice_info); // sum of all choice prices
@@ -779,9 +789,9 @@ function calculateMultiPrice(choices) {
       "Custom Part Name": custom_name,
       "Z Clip Type": choices_data.zclip,
       "Lead In For Piece": parseFloat(choices_holes[index].leadInForPiece),
+      "Quantity": parseInt(choices_data.quantity),
       "Full Lengths Needed": parseInt(total_lengths),
       "Length": parseFloat(choices_data.length),
-      "Quantity": parseInt(choices_data.quantity),
       "Spacing": parseFloat(choices_data.spacing),
       "Base Price Per Inch": '$' + parseFloat(base_per_inch),
       "Hole Amount": parseFloat(choices_holes[index].hole_amount),
