@@ -316,39 +316,6 @@ document.addEventListener("DOMContentLoaded", () => {
       choices.push({ zclip, quantity, length, spacing, companyName, projectName });
     });
 
-    // If same items, different sizes (Multi Product Calculator)
-    // let calc_type;
-    // if (choices.length === 1) {
-    //   // Case 1: Only one product
-    //   calc_type = "Single";
-    // }
-    // else if (choices.every(c => c.zclip === choices[0].zclip)) {
-    //   // Case 2: Multiple products but all same type
-    //   calc_type = "Multi";
-    // }
-    // else {
-    //   // Case 3: Multiple products with different types
-    //   calc_type = "Single";
-    // }
-
-    // console.log(calc_type);
-
-    // // If different items (Single Product Calculator)
-    // if (calc_type === "Multi") {
-    //   console.log("Using Multi Product Calculator.");
-    //   calculateMultiPrice(choices);
-    // }
-
-    // // If one item (Single Product Calculator)
-    // else if (calc_type === "Single") {
-    //   console.log("Using Single Product Calculator.");
-    //   calculateSinglePrice(choices);
-    //   //ADD CALCULATION FOR SINGLE PRODUCT
-    // }
-    //MULT AND SINGLE PRICE CALCULATIONS
-    // calculateMultiPrice(choices);
-    // calculateSinglePrice(choices);
-
     let total = calculateOrder(choices);
 
     return { companyName, projectName, total, choices };
@@ -495,8 +462,23 @@ function calculateSinglePrice(choices) {
     // Price per piece (Part 10)
     let price_per_piece = total_price / choices_data.quantity;
 
-    //CALCULATE TOTAL PRICE
+    //Calculate total price
     let total_single = price_per_piece * choices_data.quantity;
+
+    //Calculate price per inch
+    let price_per_inch = choices_data.quantity * lengths_needed;
+    let setup_charge = 30 * choices.length;
+    let inches_customer = choices_data.length * choices_data.quantity;
+    let total_inches_customer = 0;
+
+    total_inches_customer += inches_customer;
+
+    console.log(setup_charge);
+
+    price_per_inch = price_per_inch + setup_charge + cut_charge;
+    let price_per_inch_final = parseFloat((price_per_inch/total_inches_customer).toFixed(2));
+
+    console.log(price_per_inch_final);
 
     //ADD PART NAME
     let custom_name = name_part(choices_data);
@@ -512,7 +494,7 @@ function calculateSinglePrice(choices) {
       "Length": parseFloat(choices_data.length),
       "Spacing": parseFloat(choices_data.spacing),
       "Hole Amount": parseInt(hole_amount),
-      "Base Price Per Inch": "Not calculated for single price items",
+      "Base Price Per Inch": formatPrice(price_per_inch_final),
       "Price Per Item": formatPrice(total_single),
       "Price Per Piece": formatPrice(price_per_piece),
       "Quantity Price": formatPrice(quantity_price)
