@@ -18,78 +18,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const data = JSON.parse(localStorage.getItem("calc_results") || "{}");
-
-      if (!data.choices_array || !data.choices_array.length) {
-        document.body.innerHTML += "<p>No results found.</p>";
-        return;
-      }
-
-      document.getElementById("total").textContent =
-        "Total Order Price: $" + data.price_per_group;
-
-      const table = document.getElementById("resultsTable");
-
-      // Union of keys for headers
-      let headers = [...new Set(data.choices_array.flatMap(obj => Object.keys(obj)))];
-
-      // Remove Company/Project Name if all empty
-      headers = headers.filter(h => {
-        if (h === "Company Name" || h === "Project Name") {
-          return data.choices_array.some(obj => String(obj[h] ?? "").trim() !== "");
-        }
-        return true;
-      });
-
-      // Build HTML table
-      const thead = "<tr>" + headers.map(h => `<th>${h}</th>`).join("") + "</tr>";
-      const rows = data.choices_array.map(obj =>
-        "<tr>" + headers.map(h => `<td>${obj[h] || ""}</td>`).join("") + "</tr>"
-      ).join("");
-      table.innerHTML = thead + rows;
-
-      // Download PDF
-      document.getElementById("downloadPdfBtn").addEventListener("click", () => {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-
-        const img = new Image();
-        img.src = "../img/Monarch3Logo.png"; // PNG required
-
-        img.onload = () => {
-          const maxWidth = 50, maxHeight = 25;
-          let width = img.width, height = img.height;
-          const ratio = Math.min(maxWidth / width, maxHeight / height);
-          width *= ratio; height *= ratio;
-
-          doc.addImage(img, "PNG", 10, 10, width, height);
-
-          const startY = 20 + height;
-          const body = data.choices_array.map(row => headers.map(h => row[h] || ""));
-
-          doc.autoTable({
-            head: [headers],
-            body: body,
-            startY: startY,
-            styles: { fontSize: 8, cellPadding: 2 },
-            headStyles: { fillColor: [179, 0, 0], textColor: 255 },
-            margin: { left: 2, right: 2 }
-          });
-
-          const finalY = doc.lastAutoTable.finalY || startY;
-          doc.text(`Total Order Price: $${data.price_per_group}`, 10, finalY + 15);
-
-          doc.save("results.pdf");
-        };
-
-        img.onerror = () => {
-          alert("Logo PNG not found at ../img/Monarch3Logo.png");
-        };
-      });
-    });
-  </script>
+<script src="../js/pdf.js"></script>
 </body>
 
 </html>

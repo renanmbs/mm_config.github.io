@@ -205,39 +205,39 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Toggle Unique Project Name field
-  function changeProjectName() {
-    const existing = document.getElementById("unique_proj_name");
-    if (!existing) {
-      const newName = document.createElement("div");
-      newName.classList.add("user_choice1");
-      newName.setAttribute("id", "unique_proj_name_block");
+  // // Toggle Unique Project Name field
+  // function changeProjectName() {
+  //   const existing = document.getElementById("unique_proj_name");
+  //   if (!existing) {
+  //     const newName = document.createElement("div");
+  //     newName.classList.add("user_choice1");
+  //     newName.setAttribute("id", "unique_proj_name_block");
 
-      newName.innerHTML =
-        `<div class="input-row">
-        <div class="input-group">
-          <label for="unique_proj_name">Unique Project Name <span class="req">*</span></label>
-          <div class="with-reset">
-            <input type="text" id="unique_proj_name" name="unique_proj_name" required />
-            <button type="button" class="reset-field" data-target="unique_proj_name">✕</button>
-          </div>
-        </div>
-      </div>`;
+  //     newName.innerHTML =
+  //       `<div class="input-row">
+  //       <div class="input-group">
+  //         <label for="unique_proj_name">Unique Project Name <span class="req">*</span></label>
+  //         <div class="with-reset">
+  //           <input type="text" id="unique_proj_name" name="unique_proj_name" required />
+  //           <button type="button" class="reset-field" data-target="unique_proj_name">✕</button>
+  //         </div>
+  //       </div>
+  //     </div>`;
 
-      userChoiceContainer.appendChild(newName);
+  //     userChoiceContainer.appendChild(newName);
 
-      newName.querySelector(".reset-field").addEventListener("click", () => {
-        const input = document.getElementById("unique_proj_name");
-        if (input) input.value = "";
-      });
+  //     newName.querySelector(".reset-field").addEventListener("click", () => {
+  //       const input = document.getElementById("unique_proj_name");
+  //       if (input) input.value = "";
+  //     });
 
-    }
+  //   }
 
-    else {
-      const block = document.getElementById("unique_proj_name_block");
-      if (block) block.remove();
-    }
-  }
+  //   else {
+  //     const block = document.getElementById("unique_proj_name_block");
+  //     if (block) block.remove();
+  //   }
+  // }
 
   // Add new user choice block
   let choiceCount = 0;
@@ -273,15 +273,19 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="input-row">
 
             <div class="input-group">
-              <label for="len">Length <span class="span2">(Inches)</span><span class="tooltip"
-                  data-tooltip='Spacing must be in 0.25" increment'><span class="req">*</span></span></label>
+              <label for="len" class="tooltip" data-tooltip='Spacing must be in 0.25" increments'>
+                Length <span class="span2">(Inches)</span>
+                <span class="req">*</span>
+              </label>
+
               <input type="number" name="len" min="1.5" max="144" step="0.25" placeholder='Choose from 1.5" to 144"'
                 id="len" required />
             </div>
 
             <div class="input-group">
-              <label for="space">Spacing <span class="span2">(Inches)</span><span class="tooltip"
-                  data-tooltip='Spacing must be in 0.5" increment'><span class="req">*</span></span></label>
+              <label for="space" class="tooltip" data-tooltip='Spacing must be in 0.5" increment'>
+                Spacing <span class="span2">(Inches)</span><span class="req">*</span>
+              </label>
               <input type="number" name="space" min="1" placeholder='Min. 1"' step="0.5" required id="space" />
             </div>
 
@@ -509,9 +513,9 @@ function calculateSinglePrice(choices) {
       "Spacing": parseFloat(choices_data.spacing),
       "Hole Amount": parseInt(hole_amount),
       "Base Price Per Inch": "Not calculated for single price items",
-      "Price Per Item": '$' + parseFloat(total_single.toFixed(2)),
-      "Price Per Piece": '$' + parseFloat(price_per_piece.toFixed(2)),
-      "Quantity Price": '$' + parseFloat(quantity_price)
+      "Price Per Item": formatPrice(total_single),
+      "Price Per Piece": formatPrice(price_per_piece),
+      "Quantity Price": formatPrice(quantity_price)
     };
 
     choice_info.push(unsorted_obj_answer);
@@ -642,16 +646,17 @@ function calculateMultiPrice(choices) {
       "Length": parseFloat(item.length),
       "Spacing": parseFloat(item.spacing),
       "Hole Amount": parseInt(item.hole_amount),
-      "Base Price Per Inch": '$' + base_per_inch,
-      "Price Per Item": '$' + total_single,
-      "Price Per Piece": '$' + per_run_per_inch,
-      "Quantity Price": '$' + parseFloat(quantity_price),
+      "Base Price Per Inch": formatPrice(base_per_inch),
+      "Price Per Item": formatPrice(total_single),
+      "Price Per Piece": formatPrice(per_run_per_inch),
+      "Quantity Price": formatPrice(quantity_price),
     };
 
     choice_info.push(unsorted_obj_answer);
   }
 
-  let total_order_price = total_order(choice_info).toFixed(2);
+  let total_order_price = total_order(choice_info);
+  total_order_price = total_order_price.toFixed(2);
   //DO SOMETHING WITH TOTAL ORDER PRICE
   return choice_info;
 }
@@ -668,18 +673,26 @@ function sortObjectKeys(obj) {
 
 // Calculate total order price
 function total_order(choices) {
-  let total_order = 0;
+  let total = 0;
 
-  for (let choices_data of choices) {
-    // Remove $ and convert to number
-    const price = parseFloat(choices_data["Price Per Item"].replace('$', ''));
-    // console.log("pre", total_order);
-    total_order += price;
-    // console.log("in", total_order);
+  for (const item of choices) {
+    let raw = item["Price Per Item"];
+
+    if (raw == null) continue; // skip missing
+
+    // If it's already a number, use it
+    if (typeof raw === "number") {
+      total += raw;
+      continue;
+    }
+
+    // Otherwise it's a string like "$1,234.56" — strip $ and commas, then parse
+    const num = parseFloat(String(raw).replace(/[$,]/g, ""));
+    if (!isNaN(num)) total += num;
+    // else skip silently (or you can console.warn here)
   }
 
-  // console.log("post", total_order);
-  return total_order;
+  return total;
 }
 
 //Function to calculate multi price and single price
@@ -706,7 +719,7 @@ function calculateOrder(choices) {
   }
 
   // ONE CALL — prints the full merged dataset
-  print_results(all_results, grand_total.toFixed(2));
+  print_results(all_results, formatPrice(grand_total));
   return grand_total;
 }
 
@@ -759,23 +772,33 @@ function name_part(choice) {
   return custom_name;
 }
 
-//Function to add both single and multi results into the same container
-// let array = [];
-// function gatherdata(choice) {
-//   array.push({ choice, "Price per group": parseFloat(price_per_group) });
-
-//   print_results(array,price_per_group);
-// }
-
-
+// Format price with commas and two decimals
+function formatPrice(value) {
+  return value.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
 
 //Function to print the results
-function print_results(results_array, total_order_price) {
+function print_results(results_array, grand_total) {
+  console.log(grand_total);
+  const formatted = results_array.map(item => {
+    const obj = { ...item };
+    for (const key of ["Base Price Per Inch", "Price Per Item", "Price Per Piece", "Quantity Price"]) {
+      if (obj[key] != null && !String(obj[key]).startsWith('$')) {
+        obj[key] = '$' + formatPrice(parseFloat(String(obj[key]).replace(/[$,]/g, "")));
+      }
+    }
+    return obj;
+  });
+
   const data = {
-    price_per_group: total_order_price,
-    choices_array: results_array
+    price_per_group: formatPrice(grand_total),
+    choices_array: formatted
   };
 
   localStorage.setItem("calc_results", JSON.stringify(data));
+
   window.open("./html/calculation_results.html", "_blank");
 }

@@ -15,15 +15,15 @@
   <details>
     <summary>How to use the configurator:</summary>
     <ul>
-      <li>To see the results on Google Chrome: 3 dots > More Tools > Developer Tools > Console </li>
-      <li>Fill up the required fields (Company Name, Z Clip Option, Quantity, Length, Spacing)</li>
-      <li>Click "Add to cart" button, check answers on Developer Tools Console tab</li>
+      <li>Fill up the required fields (Z Clip Option, Quantity, Length, Spacing)</li>
+      <li>Click "CALCULATE"</li>
+      <li>The answers will show up on a separate page, and you will be able to download the results in PDF</li>
       <li>To clear the form data, but leave the input boxes, utilize the "Clear All Fields" button</li>
       <li><small>Obs: To reset everything, please reload the page</small></li>
     </ul>
     <br />
     <small>
-      <p><span>Usability yet to be completed: "set unique project name" button</span></p>
+      <!-- <p><span>For </span></p> -->
     </small>
   </details>
 
@@ -86,15 +86,20 @@
           <div class="input-row">
 
             <div class="input-group">
-              <label for="len">Length <span class="span2">(Inches)</span><span class="tooltip"
-                  data-tooltip='Spacing must be in 0.25" increment'><span class="req">*</span></span></label>
+              <label for="len" class="tooltip" data-tooltip='Spacing must be in 0.25" increments'>
+                Length <span class="span2">(Inches)</span>
+                <span class="req">*</span>
+              </label>
+
               <input type="number" name="len" min="1.5" max="144" step="0.25" placeholder='Choose from 1.5" to 144"'
                 id="len" required />
+
             </div>
 
             <div class="input-group">
-              <label for="space">Spacing <span class="span2">(Inches)</span><span class="tooltip"
-                  data-tooltip='Spacing must be in 0.5" increment'><span class="req">*</span></span></label>
+              <label for="space" class="tooltip" data-tooltip='Spacing must be in 0.5" increment'>
+                Spacing <span class="span2">(Inches)</span><span class="req">*</span>
+              </label>
               <input type="number" name="space" min="1" placeholder='Min. 1"' step="0.5" required id="space" />
             </div>
 
@@ -126,7 +131,7 @@
           <div class="input-row buttons">
             <button type="button" class="clear-btn">Clear</button>
             <button type="button" class="remove-btn">Remove This Option</button>
-            <!-- <button type="button" class="change-btn">Set Unique Project Name</button> ADD ON JAVASCRIPT AS WELL --> 
+            <!-- <button type="button" class="change-btn">Set Unique Project Name</button> ADD ON JAVASCRIPT AS WELL -->
           </div>
 
         </div>
@@ -134,7 +139,7 @@
 
       <!-- Add new option -->
       <div id="form_but">
-        <button type="button" id="add_choice_btn">Add New Z Clip Option</button>
+        <button type="button" id="add_choice_btn">Add New Option</button>
         <button type="button" id="clear_all">Clear All Fields</button>
       </div>
 

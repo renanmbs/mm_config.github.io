@@ -1,3 +1,13 @@
+/*
+
+Palette:
+
+Red - #bd2225
+Grey - #3e4140
+White - #f6f4f5
+
+*/
+
 * {
   padding: 0;
   margin: 0;
@@ -16,8 +26,8 @@ body {
   background-image: url("../img/Monarch3Logo.svg");
   background-position: center;
   background-repeat: no-repeat;
-  background-size: contain; 
-  background-attachment: fixed; 
+  background-size: contain;
+  background-attachment: fixed;
 }
 
 /* Top switch section */
@@ -57,7 +67,7 @@ form {
   background-color: white;
   padding: 2rem;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Grouped row of inputs */
@@ -69,7 +79,7 @@ form {
   margin-bottom: 1.5rem;
 }
 
-.input-row2{
+.input-row2 {
   display: flex;
   gap: 1rem;
   width: 100%;
@@ -80,7 +90,7 @@ form {
   text-align: left;
 }
 
-.input-group2{
+.input-group2 {
   display: flex;
   flex-direction: column;
 }
@@ -128,16 +138,16 @@ option {
   align-items: center;
 }
 
-#form_but2{
+#form_but2 {
   display: flex;
   margin: 0 !important;
   align-items: center;
 }
 
-#clear_all{
+#clear_all {
   background-color: transparent !important;
   font-size: smaller !important;
-  color:rgb(179, 0, 0) !important;
+  color: rgb(179, 0, 0) !important;
   transition: all 0.3s ease, color 0.3s ease;
 }
 
@@ -152,14 +162,9 @@ option {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-#form_but button:hover {
-  background-color: grey;
-  color: white;
-}
-
-#clear_all:hover{
+#clear_all:hover {
   text-decoration: underline;
-  color:black !important;
+  color: #3e4140 !important;
   background-color: transparent;
 }
 
@@ -199,14 +204,18 @@ option {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  background-color: lightgrey;
-  color: black;
-  transition: background-color 0.3s ease;
+  background-color: #bd2225;
+  color: white;
+  transition: all 0.6s ease;
+  border: 2px solid transparent !important; 
 }
 
 #submit_btn:hover {
-  background-color: grey;
-  color: white;
+  background-color: #bd2225cf !important; /* only the color changes on hover */
+}
+
+#submit_btn:active {
+  scale: 0.9;
 }
 
 .with-reset {
@@ -217,7 +226,8 @@ option {
 
 .with-reset input {
   flex: 1;
-  padding-right: 2rem; /* space for button */
+  padding-right: 2rem;
+  /* space for button */
 }
 
 .with-reset .reset-field {
@@ -232,25 +242,26 @@ option {
   line-height: 1;
 }
 
-.tooltip {
-  position: relative;
-  transition: background-color 0.2s ease;
-  text-align: center;
+/* Tooltip applied directly on label */
+label.tooltip {
+  position: relative; /* allows absolute positioning for tooltip */
+  display: inline-block;
 }
 
-.tooltip::after {
+label.tooltip::after {
   content: attr(data-tooltip);
   position: absolute;
-  bottom: 125%;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 125%; /* positions above the label */
+  left: 0; /* aligns with the label start */
+  transform: none;
   background: white;
   color: #333;
   padding: 0.75rem 1rem;
   border-radius: 8px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-  width: auto;
-  font-size: 0.90rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  width: max-content;
+  min-width: 150px; /* optional, keeps tooltip readable */
+  font-size: 0.9rem;
   z-index: 100;
   white-space: nowrap;
   opacity: 0;
@@ -258,8 +269,13 @@ option {
   transition: opacity 0.5s ease;
 }
 
-.tooltip:hover::after {
+label.tooltip:hover::after {
   opacity: 1;
+}
+
+/* Maintain previous tooltip text alignment */
+.tooltip {
+  text-align: left;
 }
 
 .with-reset .reset-field:hover {
@@ -270,10 +286,12 @@ option {
 .hole_radio input[type="radio"] {
   margin: 1rem 0.25rem 1rem 0.5rem;
 }
+
 .hole_radio label {
   font-weight: normal;
 }
-legend{
+
+legend {
   font-weight: bold;
 }
 
@@ -281,30 +299,45 @@ fieldset legend span {
   font-weight: normal;
 }
 
-label > span[data-tooltip] {
+label>span[data-tooltip] {
   font-weight: normal;
 }
 
-details ul{
+details ul {
   margin: 1.5rem 2rem .5rem 0;
 }
 
-details li{
+details li {
   margin: 0.5rem 0rem 0 2rem;
 }
 
-details p{
+details p {
   margin: 0.5rem;
 }
 
-details span{
+details span {
   color: darkred;
   font-weight: bold;
 }
 
-.span2{
+.span2 {
   text-align: center;
   font-size: 0.8rem;
   color: grey;
 }
 
+#add_choice_btn {
+  background-color: #3e4140 !important;
+  color: white !important;
+  border: 2px solid transparent !important; /* reserve space to prevent scaling */
+  border-radius: 4px !important;
+  transition: background-color 0.3s ease-in-out, background-color 0.3s ease-in-out !important;
+}
+
+#add_choice_btn:hover {
+  background: #3e4140d0 !important; /* only the color changes on hover */
+}
+
+.tooltip {
+  text-align: left;
+}
