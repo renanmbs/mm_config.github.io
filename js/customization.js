@@ -1,31 +1,5 @@
 // UI and UX Components for Z Clip Customization Form
 
-/* CHANGES BETWEEN VERSIONS
-
-- Changes on the length > spacing validation
-- Console logs for debugging
-- Details tab on how to use it
-
-*/
-
-/*
-PRINT RESULTS:
-
-- ONE PRODUCT - WORKS
-- ONE PRODUCT, MULTIPLE ITEMS - WORKS
-- MULTIPLE ITEMS, MULTIPLE PRODUCTS - DOESN'T WORK
-*/ 
-
-/*
-
-TO DO:
-
-- Solve multiple items, multiple products printing fix
-- Check wrong hole amount (see image)
-- Fix hole amount display
-
-*/
-
 // When the DOM is fully loaded, initialize event listeners and form validation
 document.addEventListener("DOMContentLoaded", () => {
   const userChoiceContainer = document.getElementById("user_choice_container");
@@ -35,19 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const clearAllBtn = document.getElementById("clear_all");
 
   clearAllBtn.addEventListener("click", () => {
-    const form = document.getElementById("customerForm");
-
-    // Reset all inputs in the form
-    form.querySelectorAll("input, select").forEach(el => {
-      if (el.tagName === "SELECT") {
-        el.selectedIndex = 0;
-      } else {
-        el.value = "";
-        el.setCustomValidity(""); // Clear validation errors
-      }
-    });
-
-
+    location.reload();
   });
 
   // Add event listeners for buttons inside user_choice dynamically (event delegation)
@@ -454,7 +416,7 @@ function calculateSinglePrice(choices) {
     let total_punch_charge = hole_amount * 0.25;
     if (total_punch_charge < 0.55) total_punch_charge = 0.55;
 
-    let total_punch_job = (total_punch_charge * choices_data.quantity) + 30;
+    let total_punch_job = (total_punch_charge * choices_data.quantity) + 50;
 
     // Total Price (Part 9)
     let total_price = material_price + cut_charge + total_punch_job;
@@ -467,18 +429,18 @@ function calculateSinglePrice(choices) {
 
     //Calculate price per inch
     let price_per_inch = choices_data.quantity * lengths_needed;
-    let setup_charge = 30 * choices.length;
+    let setup_charge = 50 * choices.length;
     let inches_customer = choices_data.length * choices_data.quantity;
     let total_inches_customer = 0;
 
     total_inches_customer += inches_customer;
 
-    console.log(setup_charge);
+    // console.log(setup_charge);
 
     price_per_inch = price_per_inch + setup_charge + cut_charge;
-    let price_per_inch_final = parseFloat((price_per_inch/total_inches_customer).toFixed(2));
+    let price_per_inch_final = parseFloat((price_per_inch / total_inches_customer).toFixed(2));
 
-    console.log(price_per_inch_final);
+    // console.log(price_per_inch_final);
 
     //ADD PART NAME
     let custom_name = name_part(choices_data);
@@ -511,7 +473,7 @@ function calculateSinglePrice(choices) {
 // Get price based on quantity and Z clip type
 function getPrice(quantity, zclip_type) {
 
-  console.log(zclip_type);
+  // console.log(zclip_type);
 
   let getPrice_result;
 
@@ -587,7 +549,7 @@ function calculateMultiPrice(choices) {
   const quantity_price = getPrice(total_lengths, groupType);
 
   // Setup charge (quick calc)
-  const setup_charge = 30 * piece_order_array.length;
+  const setup_charge = 50 * piece_order_array.length;
 
   // Cut charge across the group (fixing the out-of-scope bug)
   let cut_charge_total = 0;
@@ -764,7 +726,7 @@ function formatPrice(value) {
 
 //Function to print the results
 function print_results(results_array, grand_total) {
-  console.log(grand_total);
+  // console.log(grand_total);
   const formatted = results_array.map(item => {
     const obj = { ...item };
     for (const key of ["Base Price Per Inch", "Price Per Item", "Price Per Piece", "Quantity Price"]) {
