@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
   table.innerHTML =
     `<tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr>` +
     data.choices_array.map(row =>
-      `<tr>${headers.map(h => `<td>${row[h] || ""}</td>`).join("")}</tr>`
+      `<tr>${headers.map(h => `<td>${row[h] != null ? row[h] : ""}</td>`).join("")}</tr>`
     ).join("");
 
   // --- Show total ---
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Header text (aligned right)
       doc.setFontSize(14);
       doc.text("Order Summary", pageWidth - margin, topY + 15, { align: "right" });
-      
+
       doc.setFontSize(10);
       doc.text(new Date().toLocaleDateString(), pageWidth - margin, topY + 30, { align: "right" });
 
@@ -97,62 +97,64 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Table
       doc.autoTable({
-  head: [formattedHeaders],
-  body: data.choices_array.map(r => filteredHeaders.map(h => r[h] || "")),
-  startY: headerInfoY,
-  styles: {
-    fontSize: 10,
-    cellPadding: 6,
-    overflow: "linebreak",
-    halign: "center",
-    valign: "middle",
-    textColor: 0,
-    lineWidth: 0.2,
-    lineColor: 0
-  },
-  headStyles: {
-    fillColor: [179, 0, 0],
-    textColor: 255,
-    fontSize: 9,
-    halign: "center",
-    valign: "middle",
-    lineWidth: 0
-  },
-  margin: { left: 5, right: 5 },
-  tableWidth: "auto",
-  columnStyles: filteredHeaders.reduce((acc, h, i) => {
-    if (h === "Custom Part Name") {
-      acc[i] = { cellWidth: "wrap", minCellWidth: 60, maxCellWidth: 140 }; // allow wrapping
-    } else {
-      acc[i] = { cellWidth: "wrap", minCellWidth: 40, maxCellWidth: 80 }; // other columns
-    }
-    return acc;
-  }, {}),
-  didDrawCell: function(data) {
-    const { section, cell } = data;
+        head: [formattedHeaders],
+        body: data.choices_array.map(r => filteredHeaders.map(h =>
+          r[h] != null ? r[h] : ""
+        )),
+        startY: headerInfoY,
+        styles: {
+          fontSize: 10,
+          cellPadding: 6,
+          overflow: "linebreak",
+          halign: "center",
+          valign: "middle",
+          textColor: 0,
+          lineWidth: 0.2,
+          lineColor: 0
+        },
+        headStyles: {
+          fillColor: [179, 0, 0],
+          textColor: 255,
+          fontSize: 9,
+          halign: "center",
+          valign: "middle",
+          lineWidth: 0
+        },
+        margin: { left: 5, right: 5 },
+        tableWidth: "auto",
+        columnStyles: filteredHeaders.reduce((acc, h, i) => {
+          if (h === "Custom Part Name") {
+            acc[i] = { cellWidth: "wrap", minCellWidth: 60, maxCellWidth: 140 }; // allow wrapping
+          } else {
+            acc[i] = { cellWidth: "wrap", minCellWidth: 40, maxCellWidth: 80 }; // other columns
+          }
+          return acc;
+        }, {}),
+        didDrawCell: function (data) {
+          const { section, cell } = data;
 
-    // Draw horizontal lines for body rows
-    if (section === 'body' && data.row.index !== data.table.body.length - 1) {
-      const x1 = cell.x;
-      const x2 = cell.x + cell.width;
-      const y = cell.y + cell.height;
-      doc.setDrawColor(0);
-      doc.setLineWidth(0.2);
-      doc.line(x1, y, x2, y);
-    }
+          // Draw horizontal lines for body rows
+          if (section === 'body' && data.row.index !== data.table.body.length - 1) {
+            const x1 = cell.x;
+            const x2 = cell.x + cell.width;
+            const y = cell.y + cell.height;
+            doc.setDrawColor(0);
+            doc.setLineWidth(0.2);
+            doc.line(x1, y, x2, y);
+          }
 
-    // Draw outside border around header
-    if (section === 'head' && data.column.index === 0) {
-      const headerX = cell.x;
-      const headerY = cell.y;
-      const headerHeight = cell.height;
-      const headerWidth = data.table.columns.reduce((sum, col) => sum + col.width, 0);
-      doc.setDrawColor(0);
-      doc.setLineWidth(0.5);
-      doc.rect(headerX, headerY, headerWidth, headerHeight, "S"); // stroke only
-    }
-  }
-});
+          // Draw outside border around header
+          if (section === 'head' && data.column.index === 0) {
+            const headerX = cell.x;
+            const headerY = cell.y;
+            const headerHeight = cell.height;
+            const headerWidth = data.table.columns.reduce((sum, col) => sum + col.width, 0);
+            doc.setDrawColor(0);
+            doc.setLineWidth(0.5);
+            doc.rect(headerX, headerY, headerWidth, headerHeight, "S"); // stroke only
+          }
+        }
+      });
 
       const finalY = doc.lastAutoTable?.finalY || headerInfoY;
 
@@ -163,8 +165,13 @@ document.addEventListener("DOMContentLoaded", () => {
       doc.setFontSize(13);
       doc.text(`TOTAL ORDER PRICE: $${data.price_per_group}`, margin, finalY + 25, { align: "left" });
 
-      const companyName = data.choices_array[0]?.["Company Name"] || "UnknownCompany";
-      doc.save(`Monarch Custom Z Clip ${companyName}.pdf`);
+      let companyName = data.choices_array[0]?.["Company Name"];
+      let safeCompanyName = companyName ? companyName.replace(/[\/\\:*?"<>|]/g, "") : "";
+      let fileName = safeCompanyName
+        ? `Monarch Custom Z Clip ${safeCompanyName}.pdf`
+        : `Monarch Custom Z Clip.pdf`;
+
+      doc.save(fileName);
     };
 
     doc.setTextColor(0, 0, 0);

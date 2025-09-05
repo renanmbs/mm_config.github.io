@@ -339,7 +339,17 @@ const pricingTiers_MFSTR_075 = [
 
 function computeHoleData(length, spacing) {
   // holesBetween = number of spacings that actually fit strictly inside the length
+
+  if (!spacing || parseFloat(spacing) === 0) {
+    return {
+      hole_amount: 0,
+      leadInForPiece: 0,
+      leadIn: 0
+    };
+  }
+
   let holesBetween = Math.floor(length / spacing);
+
   if (Number.isInteger(length / spacing)) {
     // if spacing divides length exactly, there is one less interior spacing
     holesBetween -= 1;
@@ -413,8 +423,11 @@ function calculateSinglePrice(choices) {
     if (cut_charge < 25) cut_charge = 25;
 
     // Total Punch Charge (Part 8)
-    let total_punch_charge = hole_amount * 0.25;
-    if (total_punch_charge < 0.55) total_punch_charge = 0.55;
+    let total_punch_charge = 0;
+    if (hole_amount > 0) {
+      total_punch_charge = hole_amount * 0.25;
+      if (total_punch_charge < 0.55) total_punch_charge = 0.55;
+    }
 
     let total_punch_job = (total_punch_charge * choices_data.quantity) + 50;
 
@@ -652,9 +665,21 @@ function calculateOrder(choices) {
 
   for (const type in groups) {
     let group_results;
+
+    //IF SPACING = 0, CALCULATE THAT
+    for (const item of groups[type]) {
+      // SPACING = 0 → run zero_spacing
+      if (parseInt(item.spacing, 10) === 0) {
+        console.log("No spacing for:", item);
+        zero_spacing([item]); // pass as array so it matches your function sig
+      }
+    }
+
     if (groups[type].length > 1) {
       group_results = calculateMultiPrice(groups[type]);
-    } else {
+    }
+
+    else {
       group_results = calculateSinglePrice(groups[type]);
     }
 
@@ -702,16 +727,21 @@ function packParts(parts, stockLength) {
   return barsUsed;
 }
 
+function zero_spacing(choices_array) {
+  console.log("I am here");
+  console.log(choices_array);
+}
+
 //Naming part function
 function name_part(choice) {
   const hole_diameter = .313;
-  //Replace leading 0 from hole diameter
   const hd = hole_diameter.toString().replace(/^0+/, '');
 
-  let custom_name = `CUS-${choice.zclip}-${choice.length}H${choice.spacing}`;
-
-  //UNCOMMENT THIS WHEN HOLE DIAMETER SHOULD BE CONSIDERED;
-  // let custom_name = `CUS-${choice.zclip}-${choice.length}H${choice.spacing}_D${hd}`;
+  let custom_name = `CUS-${choice.zclip}-${choice.length}`;
+  if (choice.spacing && parseFloat(choice.spacing) > 0) {
+    custom_name += `H${choice.spacing}`;
+    //diameter: + `_D${hd}`
+  }
 
   return custom_name;
 }
