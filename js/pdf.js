@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 
   table.innerHTML =
-    `<tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr>` +
+    `<tr>${headers.map(h => `<th>${h}</th>`).join("")}<th>Drawing</th></tr>` +
     data.choices_array.map(row =>
       `<tr>${headers.map(h => `<td>${row[h] != null ? row[h] : ""}</td>`).join("")}</tr>`
     ).join("");
@@ -27,14 +27,74 @@ document.addEventListener("DOMContentLoaded", () => {
   const totalDiv = document.getElementById("total");
   if (totalDiv) totalDiv.textContent = `TOTAL ORDER PRICE: $${data.price_per_group}`;
 
-  // --- PDF download ---
+  // --- Drawing functions ---
+  async function loadTemplate(zclip) {
+    // const res = await fetch(`../svg/${zclip}.svg`);
+    const res = await fetch(`../img/zclips/MF625.svg`);
+    return await res.text();
+  }
+
+  function formatNumber(value) {
+  const num = parseFloat(value);
+  return isNaN(num) ? value : num.toFixed(3); // 3 decimals
+}
+
+  function generateSVG(template, row) {
+  return template
+    .replace(/{holes}/g, row["Hole Amount"])
+    .replace(/{leadin}/g, formatNumber(row["Lead In For Piece"]))
+    .replace(/{length}/g, formatNumber(row["Length"]))
+    .replace(/{spacing}/g, formatNumber(row["Spacing"]));
+}
+
+  function downloadSVG(filename, content) {
+    const blob = new Blob([content], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function renderDrawings(results) {
+    for (let i = 0; i < results.length; i++) {
+      const row = results[i];
+      const template = await loadTemplate(row["Z Clip Type"]);
+      const svgContent = generateSVG(template, row);
+
+      // Keep SVG in memory
+      window[`svgRow${i}`] = svgContent;
+
+      // Add a download button for each row
+      const btn = document.createElement("button");
+      btn.textContent = "Download Drawing";
+      btn.onclick = () => downloadRow(i, row);
+
+      const tr = table.rows[i + 1]; // +1 for header row
+      const td = document.createElement("td");
+      td.appendChild(btn);
+      tr.appendChild(td);
+    }
+  }
+
+  function downloadRow(i, row) {
+    const svgContent = window[`svgRow${i}`];
+    // const filename = `${row["Custom Part Name"] || "drawing"}_${i + 1}.svg`;
+    const filename = `${row["Custom Part Name"] || "drawing"}.svg`;
+    downloadSVG(filename, svgContent);
+  }
+
+  // Render drawing buttons after table is built
+  // renderDrawings(data.choices_array); --> UNCOMMENT TO HAVE DATA RENDER
+
   // --- PDF download ---
   const downloadBtn = document.getElementById("downloadPdfBtn");
   downloadBtn.addEventListener("click", () => {
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF("p", "pt", "a4"); // better precision with points
-    const margin = 36; // left/right margin
-    const topY = 40;   // top margin
+    const doc = new jsPDF("p", "pt", "a4");
+    const margin = 36;
+    const topY = 40;
 
     const img = new Image();
     img.src = "../img/Monarch3Logo.png";
@@ -42,14 +102,12 @@ document.addEventListener("DOMContentLoaded", () => {
     img.onload = () => {
       const pageWidth = doc.internal.pageSize.getWidth();
 
-      // Scale logo
+      // Logo
       const logoHeight = 40;
       const logoWidth = (img.width / img.height) * logoHeight;
-
-      // Draw logo (top-left)
       doc.addImage(img, "PNG", margin, topY, logoWidth, logoHeight);
 
-      // Header text (aligned right)
+      // Header text
       doc.setFontSize(14);
       doc.text("Order Summary", pageWidth - margin, topY + 15, { align: "right" });
 
@@ -70,14 +128,14 @@ document.addEventListener("DOMContentLoaded", () => {
           lines.forEach((txt, idx) => {
             doc.text(txt, margin, headerInfoY + idx * 25);
           });
-          headerInfoY += lines.length * 20 + 10; // push table start down
+          headerInfoY += lines.length * 20 + 10;
         }
       }
 
-      // Filter out Company/Project Name for table only
-      const filteredHeaders = headers.filter(h => h !== "Company Name" && h !== "Z Clip Type" && h !== "Project Name");
-
-      // Map headers to display names
+      // Table headers
+      const filteredHeaders = headers.filter(
+        h => h !== "Company Name" && h !== "Z Clip Type" && h !== "Project Name"
+      );
       const headerMapping = {
         "Custom Part Name": "Custom Part Number",
         "Z Clip Type": "Z Clip",
@@ -92,15 +150,12 @@ document.addEventListener("DOMContentLoaded", () => {
         "Price Per Piece": "Price Per Piece",
         "Quantity Price": "Quantity Price"
       };
-
       const formattedHeaders = filteredHeaders.map(h => headerMapping[h] || h);
 
       // Table
       doc.autoTable({
         head: [formattedHeaders],
-        body: data.choices_array.map(r => filteredHeaders.map(h =>
-          r[h] != null ? r[h] : ""
-        )),
+        body: data.choices_array.map(r => filteredHeaders.map(h => r[h] != null ? r[h] : "")),
         startY: headerInfoY,
         styles: {
           fontSize: 10,
@@ -124,17 +179,16 @@ document.addEventListener("DOMContentLoaded", () => {
         tableWidth: "auto",
         columnStyles: filteredHeaders.reduce((acc, h, i) => {
           if (h === "Custom Part Name") {
-            acc[i] = { cellWidth: "wrap", minCellWidth: 60, maxCellWidth: 140 }; // allow wrapping
+            acc[i] = { cellWidth: "wrap", minCellWidth: 60, maxCellWidth: 140 };
           } else {
-            acc[i] = { cellWidth: "wrap", minCellWidth: 40, maxCellWidth: 80 }; // other columns
+            acc[i] = { cellWidth: "wrap", minCellWidth: 40, maxCellWidth: 80 };
           }
           return acc;
         }, {}),
         didDrawCell: function (data) {
           const { section, cell } = data;
 
-          // Draw horizontal lines for body rows
-          if (section === 'body' && data.row.index !== data.table.body.length - 1) {
+          if (section === "body" && data.row.index !== data.table.body.length - 1) {
             const x1 = cell.x;
             const x2 = cell.x + cell.width;
             const y = cell.y + cell.height;
@@ -143,24 +197,23 @@ document.addEventListener("DOMContentLoaded", () => {
             doc.line(x1, y, x2, y);
           }
 
-          // Draw outside border around header
-          if (section === 'head' && data.column.index === 0) {
+          if (section === "head" && data.column.index === 0) {
             const headerX = cell.x;
             const headerY = cell.y;
             const headerHeight = cell.height;
             const headerWidth = data.table.columns.reduce((sum, col) => sum + col.width, 0);
             doc.setDrawColor(0);
             doc.setLineWidth(0.5);
-            doc.rect(headerX, headerY, headerWidth, headerHeight, "S"); // stroke only
+            doc.rect(headerX, headerY, headerWidth, headerHeight, "S");
           }
         }
       });
 
       const finalY = doc.lastAutoTable?.finalY || headerInfoY;
 
-      // Total price box
+      // Total
       doc.setFillColor(255, 255, 255);
-      doc.setTextColor(0, 0, 0); // white text
+      doc.setTextColor(0, 0, 0);
       doc.rect(margin, finalY + 10, pageWidth - margin * 2, 20, "F");
       doc.setFontSize(13);
       doc.text(`TOTAL ORDER PRICE: $${data.price_per_group}`, margin, finalY + 25, { align: "left" });
@@ -173,8 +226,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       doc.save(fileName);
     };
-
-    doc.setTextColor(0, 0, 0);
 
     img.onerror = () => alert("Logo PNG not found at ../img/Monarch3Logo.png");
   });
