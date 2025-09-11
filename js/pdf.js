@@ -97,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Render drawing buttons after table is built
-  // renderDrawings(data.choices_array); //--> UNCOMMENT TO HAVE DATA RENDER
+  //renderDrawings(data.choices_array); //--> UNCOMMENT TO HAVE DATA RENDER
 
   // --- PDF download ---
   const downloadBtn = document.getElementById("downloadPdfBtn");
