@@ -420,7 +420,12 @@ function calculateSinglePrice(choices) {
 
     // Material Price
     let material_price = lengths_needed * quantity_price;
-    if (choices_data.quantity >= 100) material_price += 25; // bulk material
+    
+    console.log("Quantity x Length " + material_price);
+
+    if (choices_data.quantity < 100) material_price += 25; // bulk material
+
+    console.log("Added or Not $25 " + material_price );
 
     // Cut Charge per piece
     const cut_charge_per_piece = choices_data.quantity >= 100 ? 0.25 : 0;
@@ -437,7 +442,9 @@ function calculateSinglePrice(choices) {
     // Track totals for price per inch
     const inches_customer = choices_data.length * choices_data.quantity;
     total_inches_customer += inches_customer;
-    total_base_pool += total_line_price;
+    // total_base_pool += total_line_price;
+
+    const price_per_inch_line = total_line_price / inches_customer;
 
     // Part name
     const custom_name = name_part(choices_data);
@@ -453,7 +460,7 @@ function calculateSinglePrice(choices) {
       "Length": parseFloat(choices_data.length),
       "Spacing": parseFloat(choices_data.spacing),
       "Hole Amount": parseInt(hole_amount),
-      "Base Price Per Inch": formatPrice(total_base_pool / total_inches_customer),
+      "Base Price Per Inch": formatPrice(price_per_inch_line),
       "Price Per Item": formatPrice(total_line_price),
       "Price Per Piece": formatPrice(price_per_piece),
       "Quantity Price": formatPrice(quantity_price)
