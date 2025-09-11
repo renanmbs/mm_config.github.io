@@ -63,3 +63,17 @@ th {
   color: white;
 }
 
+.download_btn_draw{
+  padding: 0.5rem;
+  border: 0.5px solid rgb(179, 0, 0);
+  background-color: transparent;
+  color: rgb(179, 0, 0);
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.3s ease, color 0.3s ease;
+}
+
+.download_btn_draw:hover{
+  background-color: rgba(179, 0, 0, 0.672);
+  color: white;
+}

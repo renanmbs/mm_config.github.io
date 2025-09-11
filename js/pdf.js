@@ -29,8 +29,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Drawing functions ---
   async function loadTemplate(zclip) {
-    // const res = await fetch(`../svg/${zclip}.svg`);
-    const res = await fetch(`../img/zclips/MF625.svg`);
+    const res = await fetch(`../img/zclips/${zclip}.svg`);
+    // const res = await fetch(`../img/zclips/MF625.svg`);
+    // console.log(zclip);
     return await res.text();
   }
 
@@ -39,12 +40,21 @@ document.addEventListener("DOMContentLoaded", () => {
   return isNaN(num) ? value : num.toFixed(3); // 3 decimals
 }
 
-  function generateSVG(template, row) {
-  return template
-    .replace(/{holes}/g, row["Hole Amount"])
+ function generateSVG(template, row) {
+  let svg = template
     .replace(/{leadin}/g, formatNumber(row["Lead In For Piece"]))
     .replace(/{length}/g, formatNumber(row["Length"]))
     .replace(/{spacing}/g, formatNumber(row["Spacing"]));
+
+  // Only replace holes if > 0
+  if (parseInt(row["Hole Amount"], 10) > 0) {
+    svg = svg.replace(/{holes}/g, row["Hole Amount"]);
+  } 
+  else {
+    // Remove the whole ", {holes}X" text
+     svg = svg.replace(/, <tspan[^>]*>\{holes\}X<\/tspan>/g, "");
+  }
+  return svg;
 }
 
   function downloadSVG(filename, content) {
@@ -69,6 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Add a download button for each row
       const btn = document.createElement("button");
       btn.textContent = "Download Drawing";
+      btn.classList.add("download_btn_draw");
       btn.onclick = () => downloadRow(i, row);
 
       const tr = table.rows[i + 1]; // +1 for header row
@@ -86,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Render drawing buttons after table is built
-  // renderDrawings(data.choices_array); --> UNCOMMENT TO HAVE DATA RENDER
+  // renderDrawings(data.choices_array); //--> UNCOMMENT TO HAVE DATA RENDER
 
   // --- PDF download ---
   const downloadBtn = document.getElementById("downloadPdfBtn");

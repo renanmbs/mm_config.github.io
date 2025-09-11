@@ -217,12 +217,12 @@ document.addEventListener("DOMContentLoaded", () => {
               <label for="zclip">Z Clip Options <span class="req">*</span></label>
               <select id="zclip" name="zclip" class="zclip" required>
                 <option value="" selected disabled>Choose An Option</option>
-                <option value="MF625">MF625</option>
-                <option value="MF375">MF375</option>
                 <option value="MF250">MF250</option>
-                <option value="MFSTR-0375">MFSTR-0375</option>
+                <option value="MF375">MF375</option>
+                <option value="MF625">MF625</option>
                 <option value="MFSTR-050">MFSTR-050</option>
                 <option value="MFSTR-075">MFSTR-075</option>
+                <option value="MFSTR-0375">MFSTR-0375</option>
               </select>
             </div>
 
@@ -248,7 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
               <label for="space" class="tooltip" data-tooltip='Spacing must be in 0.5" increment'>
                 Spacing <span class="span2">(Inches)</span><span class="req">*</span>
               </label>
-              <input type="number" name="space" min="1" placeholder='Min. 1"' step="0.5" required id="space" />
+              <input type="number" name="space" min="0" placeholder='Min. 0"' step="0.5" required id="space" />
             </div>
 
           </div>
@@ -387,6 +387,7 @@ function calculateLeadIn(choices) {
 
 function calculateSinglePrice(choices) {
   const choice_info = [];
+  let total_inches_customer = 0;
 
   for (const choices_data of choices) {
     const { hole_amount, leadInForPiece, leadIn } = computeHoleData(
@@ -402,6 +403,8 @@ function calculateSinglePrice(choices) {
       case 24: singleYield = 23.875; break;
       case 36: singleYield = 35.875; break;
       case 48: singleYield = 47.875; break;
+      case 140: singleYield = 139.875; break;
+      case 144: singleYield = 143.875; break;
       default: singleYield = choices_data.length + 0.125;
     }
 
@@ -444,14 +447,15 @@ function calculateSinglePrice(choices) {
     let price_per_inch = choices_data.quantity * lengths_needed;
     let setup_charge = 50 * choices.length;
     let inches_customer = choices_data.length * choices_data.quantity;
-    let total_inches_customer = 0;
 
     total_inches_customer += inches_customer;
 
     // console.log(setup_charge);
 
     price_per_inch = price_per_inch + setup_charge + cut_charge;
-    let price_per_inch_final = parseFloat((price_per_inch / total_inches_customer).toFixed(2));
+    let price_per_inch_final = total_inches_customer > 0
+      ? parseFloat((price_per_inch / total_inches_customer).toFixed(2))
+      : 0;
 
     // console.log(price_per_inch_final);
 
@@ -509,6 +513,8 @@ function getPrice(quantity, zclip_type) {
     case "MFSTR-075":
       getPrice_result = pricingTiers_MFSTR_075.find(tier => quantity <= tier.max).price;
       break;
+    default:
+      throw new Error("Unknown zclip type: " + zclip_type);
   }
   return getPrice_result;
 }
@@ -588,6 +594,10 @@ function calculateMultiPrice(choices) {
   //POTENTIAL ISSUE HERE ------------------------------
 
   console.log("Cut charge " + cut_charge_total);
+
+  if (!total_lengths || !sum_inches_customer) {
+    return []; // or handle gracefully
+  }
 
   // Base price per inch
   let base_pool = (quantity_price * total_lengths) + setup_charge + cut_charge_total;
@@ -691,14 +701,14 @@ function calculateOrder(choices) {
   for (const type in groups) {
     let group_results;
 
-    //IF SPACING = 0, CALCULATE THAT
-    for (const item of groups[type]) {
-      // SPACING = 0 → run zero_spacing
-      if (parseInt(item.spacing, 10) === 0) {
-        console.log("No spacing for:", item);
-        zero_spacing([item]); // pass as array so it matches your function sig
-      }
-    }
+    // //IF SPACING = 0, CALCULATE THAT
+    // for (const item of groups[type]) {
+    //   // SPACING = 0 → run zero_spacing
+    //   if (parseInt(item.spacing, 10) === 0) {
+    //     // console.log("No spacing for:", item);
+    //     zero_spacing([item]); // pass as array so it matches your function sig
+    //   }
+    // }
 
     if (groups[type].length > 1) {
       group_results = calculateMultiPrice(groups[type]);
@@ -753,10 +763,10 @@ function packParts(parts, stockLength) {
   return barsUsed;
 }
 
-function zero_spacing(choices_array) {
-  console.log("I am here");
-  console.log(choices_array);
-}
+// function zero_spacing(choices_array) {
+//   // console.log("I am here");
+//   // console.log(choices_array);
+// }
 
 //Naming part function
 function name_part(choice) {
