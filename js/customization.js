@@ -337,6 +337,8 @@ const pricingTiers_MFSTR_075 = [
   { max: Infinity, price: 77.11 }
 ];
 
+let setup_fee = 50;
+
 function computeHoleData(length, spacing) {
   // holesBetween = number of spacings that actually fit strictly inside the length
 
@@ -383,11 +385,13 @@ function calculateLeadIn(choices) {
   return { choices_holes };
 }
 
+console.log("Single Item Product Breakdown:");
+console.log("\n");
+
 // Calculate Single Price
 function calculateSinglePrice(choices) {
   const choice_info = [];
   let total_inches_customer = 0;
-  let total_base_pool = 0;
 
   for (const choices_data of choices) {
     const { hole_amount, leadInForPiece } = computeHoleData(
@@ -408,6 +412,8 @@ function calculateSinglePrice(choices) {
       default: singleYield = choices_data.length + 0.125;
     }
 
+    console.log("Single Yield: " + singleYield);
+
     // Finished Parts per Stock Length
     const total_length_stock = choices_data.length < 6 ? 140 : 144;
     const amount_finished_part = Math.floor(total_length_stock / singleYield);
@@ -418,33 +424,44 @@ function calculateSinglePrice(choices) {
     // Quantity Price
     const quantity_price = getPrice(lengths_needed, choices_data.zclip);
 
+    console.log("Quantity price: $" + quantity_price.toFixed(2));
+
     // Material Price
     let material_price = lengths_needed * quantity_price;
-    
-    //console.log("Quantity x Length " + material_price);
 
-    if (choices_data.quantity < 100) material_price += 25; // bulk material
+    console.log("Material price: $" + material_price.toFixed(2));
 
-    //console.log("Added or Not $25 " + material_price );
+    if (choices_data.quantity < 100) {
+      material_price += 25; // bulk material
+      console.log("Cut charge for less than 100 pieces: $" + material_price.toFixed(2));
+    }
+
 
     // Cut Charge per piece
     const cut_charge_per_piece = choices_data.quantity >= 100 ? 0.25 : 0;
+    if (cut_charge_per_piece !== 0) console.log(`Cut charge for 100+ pieces: $${cut_charge_per_piece.toFixed(2)}`);
 
     // Punch Charge
     const punch_charge_per_piece = hole_amount > 0 ? Math.max(hole_amount * 0.25, 0.55) : 0;
+    console.log(`Punch charge: $${punch_charge_per_piece.toFixed(2)}`);
 
     // Total line price (material + punch + cut + setup)
-    const total_line_price = material_price + (punch_charge_per_piece + cut_charge_per_piece) * choices_data.quantity + 50;
+    const total_line_price = material_price + (punch_charge_per_piece + cut_charge_per_piece) * choices_data.quantity + setup_fee; //50 setup fee
+    console.log("Setup Fee: $" + setup_fee.toFixed(2));
+    console.log("Price per item: $" + total_line_price.toFixed(2));
 
     // Price per piece
     const price_per_piece = total_line_price / choices_data.quantity;
+    console.log("Price per piece: $" + price_per_piece.toFixed(2))
 
     // Track totals for price per inch
     const inches_customer = choices_data.length * choices_data.quantity;
     total_inches_customer += inches_customer;
+    console.log(`Total inches: ${total_inches_customer}"`);
     // total_base_pool += total_line_price;
 
     const price_per_inch_line = total_line_price / inches_customer;
+    console.log("Price per inch: $" + price_per_inch_line.toFixed(2));
 
     // Part name
     const custom_name = name_part(choices_data);
@@ -465,6 +482,8 @@ function calculateSinglePrice(choices) {
       "Price Per Piece": formatPrice(price_per_piece),
       "Quantity Price": formatPrice(quantity_price)
     });
+
+    console.log("\n");
   }
 
   const total_order_price = total_order(choice_info);
@@ -545,8 +564,11 @@ function calculateMultiPrice(choices) {
       allParts.push(item.length);
     }
     sum_inches_customer += item.length * item.quantity;
-    console.log("sum of inches " + sum_inches_customer);
   }
+
+  console.log("Multiple Item Product Breakdown:");
+  console.log("\n");
+  console.log(`Total inches: ${sum_inches_customer}"`);
 
   total_lengths = packParts(allParts, total_length_stock);
 
@@ -554,12 +576,12 @@ function calculateMultiPrice(choices) {
   const groupType = choices[0]?.zclip;
   const quantity_price = getPrice(total_lengths, groupType);
 
-  console.log("Quantity price " + quantity_price);
+  console.log("Quantity price: $" + quantity_price);
 
   // Setup charge (quick calc)
-  const setup_charge = 50 * piece_order_array.length;
+  const setup_charge = setup_fee * piece_order_array.length;
 
-  console.log("Setup Fee " + setup_charge);
+  console.log("Setup Fee: $" + setup_charge);
 
   //POTENTIAL ISSUE HERE ------------------------------
 
@@ -595,20 +617,20 @@ function calculateMultiPrice(choices) {
   // If any item has quantity < 100, add $25 to the base pool
   if (piece_order_array.some(item => item.quantity < 100)) {
     cut_charge_total = 25;
+    console.log("Cut charge for less than 100 pieces: $" + cut_charge_total);
   }
 
   if (!total_lengths || !sum_inches_customer) {
     return []; // or handle gracefully
   }
 
-  console.log("Cut charge: " + cut_charge_total);
-
 
   // Base price per inch
   let base_pool = (quantity_price * total_lengths) + setup_charge + cut_charge_total;
   let base_per_inch = parseFloat((base_pool / sum_inches_customer).toFixed(2));
 
-  console.log("Price per inch charge " + base_per_inch);
+  console.log("Price per inch: $" + base_per_inch);
+  console.log("\n");
 
   const choice_info = [];
 
@@ -618,22 +640,25 @@ function calculateMultiPrice(choices) {
     let punch_charge = item.hole_amount * 0.25;
     if (punch_charge < 0.55) punch_charge = 0.55;
 
-    console.log("Punch charge " + punch_charge);
+    // Name
+    let custom_name = name_part(item);
+
+    console.log(custom_name);
+    console.log(`Punch charge: $${punch_charge}`);
 
     // Cut charge per piece
     let cut_charge = item.quantity >= 100 ? 0.25 : 0;
+
+    if (cut_charge !== 0) console.log(`Cut charge for 100+ pieces: $${cut_charge}`);
 
     // Per run per inch
     let per_run_per_inch = (item.length * base_per_inch) + punch_charge + cut_charge;
     per_run_per_inch = parseFloat(per_run_per_inch.toFixed(2));
 
-    console.log("Per inch per run " + per_run_per_inch);
+    console.log(`Price per item per piece: $${per_run_per_inch}`);
 
     // Total price for that line
     let total_single = parseFloat((per_run_per_inch * item.quantity).toFixed(2));
-
-    // Name
-    let custom_name = name_part(item);
 
     let unsorted_obj_answer = {
       "Company Name": capitalizeFirstLetter(item.companyName),
@@ -653,6 +678,7 @@ function calculateMultiPrice(choices) {
     };
 
     choice_info.push(unsorted_obj_answer);
+    console.log("\n")
   }
 
   let total_order_price = total_order(choice_info);
