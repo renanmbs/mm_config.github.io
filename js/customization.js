@@ -377,21 +377,19 @@ function computeHoleData(length, spacing) {
   };
 }
 
-
 // Calculate Lead In and Hole Amount for each choice
-// --- REPLACE calculateLeadIn with this thin wrapper (optional) ---
 function calculateLeadIn(choices) {
   const choices_holes = choices.map(c => computeHoleData(c.length, c.spacing));
   return { choices_holes };
 }
 
-console.log("Single Item Product Breakdown:");
-console.log("\n");
-
 // Calculate Single Price
 function calculateSinglePrice(choices) {
   const choice_info = [];
   let total_inches_customer = 0;
+
+  console.log("Single Item Product Breakdown:");
+  console.log("\n");
 
   for (const choices_data of choices) {
     const { hole_amount, leadInForPiece } = computeHoleData(
@@ -411,6 +409,8 @@ function calculateSinglePrice(choices) {
       case 144: singleYield = 143.875; break;
       default: singleYield = choices_data.length + 0.125;
     }
+
+    console.log(choices_data.zclip + ":");
 
     console.log("Single Yield: " + singleYield);
 
@@ -435,7 +435,6 @@ function calculateSinglePrice(choices) {
       material_price += 25; // bulk material
       console.log("Cut charge for less than 100 pieces: $" + material_price.toFixed(2));
     }
-
 
     // Cut Charge per piece
     const cut_charge_per_piece = choices_data.quantity >= 100 ? 0.25 : 0;
@@ -583,34 +582,6 @@ function calculateMultiPrice(choices) {
 
   console.log("Setup Fee: $" + setup_charge);
 
-  //POTENTIAL ISSUE HERE ------------------------------
-
-  // Cut charge across the group (fixing the out-of-scope bug)
-  // let cut_charge_total = 0;
-  // for (const item of piece_order_array) {
-  //   cut_charge_total += Math.max(25, item.quantity * 0.25);
-  // }
-
-  //If quantity > 100, add $25 to base price per inch
-  // let cut_charge_total = 0;
-  // if(item.quantity < 100){
-  //   cut_charge_total = 25;
-  //   console.log("Cut charge is calculated inside of base price per inch " + cut_charge_total);
-  // }
-
-  // else{
-  //   cut_charge_total = 0;
-  //   console.log("Cut charge is calculated OUTSIDE of base price per inch " + cut_charge_total);
-  // }
-
-  // let cut_charge_total = piece_order_array
-  //   .reduce((sum, item) => sum + item.quantity * 0.25, 0);
-
-  // cut_charge_total = Math.max(25, cut_charge_total);
-
-
-  //POTENTIAL ISSUE HERE ------------------------------
-
   // Base price per inch calculation (before per-item loop)
   let cut_charge_total = 0;
 
@@ -623,7 +594,6 @@ function calculateMultiPrice(choices) {
   if (!total_lengths || !sum_inches_customer) {
     return []; // or handle gracefully
   }
-
 
   // Base price per inch
   let base_pool = (quantity_price * total_lengths) + setup_charge + cut_charge_total;
@@ -735,15 +705,6 @@ function calculateOrder(choices) {
   for (const type in groups) {
     let group_results;
 
-    // //IF SPACING = 0, CALCULATE THAT
-    // for (const item of groups[type]) {
-    //   // SPACING = 0 → run zero_spacing
-    //   if (parseInt(item.spacing, 10) === 0) {
-    //     // console.log("No spacing for:", item);
-    //     zero_spacing([item]); // pass as array so it matches your function sig
-    //   }
-    // }
-
     if (groups[type].length > 1) {
       group_results = calculateMultiPrice(groups[type]);
     }
@@ -797,11 +758,6 @@ function packParts(parts, stockLength) {
   return barsUsed;
 }
 
-// function zero_spacing(choices_array) {
-//   // console.log("I am here");
-//   // console.log(choices_array);
-// }
-
 //Naming part function
 function name_part(choice) {
   const hole_diameter = .313;
@@ -826,7 +782,7 @@ function formatPrice(value) {
 
 //Function to print the results
 function print_results(results_array, grand_total) {
-  // console.log(grand_total);
+
   const formatted = results_array.map(item => {
     const obj = { ...item };
     for (const key of ["Base Price Per Inch", "Price Per Item", "Price Per Piece", "Quantity Price"]) {
