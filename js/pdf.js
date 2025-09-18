@@ -149,31 +149,38 @@ document.addEventListener("DOMContentLoaded", () => {
       pdf.addImage(canvas, "PNG", svgX, svgTop, svgWidth, svgHeight);
 
       let hole_size = 0;
+      let weight = 0;
 
       switch (row?.["Z Clip Type"]) {
         case "MF250":
           hole_size = 203;
+          weight = 2.442;
           break;
         case "MF375":
           hole_size = 203;
           tableTopY = 1100;
           noteY = 1350;
+          weight = 2.681;
           break;
         case "MF625":
           hole_size = 203;
           tableTopY = 1220;
           noteY = 1450;
+          weight = 2.484;
           break;
         case "MFSTR-050":
           hole_size = 250;
+          weight = 4.133;
           break;
         case "MFSTR-075":
           hole_size = 250;
+          weight = 9.231;
           break;
         case "MFSTR-0375":
           hole_size = 250;
           tableTopY = 1100;
           noteY = 1350;
+          weight = 6.143;
           break;
       }
 
@@ -200,13 +207,12 @@ document.addEventListener("DOMContentLoaded", () => {
         row?.["Lead In For Piece"] || "",
         row?.["Price Per Piece"] || "",
         row?.["Price Per Item"] || "",
-        "2.675 lbmass",
+        `${weight} lbs`,
         "Aluminum 6063",
         "Mill"
       ];
 
       // Filter out empty columns
-      // --- Filter out empty columns dynamically ---
       let filtered = headers.map((h, i) => ({ header: h, value: values[i] }))
         .filter(col => col.value !== "" && col.value != null);
 
