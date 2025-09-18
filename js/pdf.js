@@ -85,42 +85,151 @@ document.addEventListener("DOMContentLoaded", () => {
 
   //
   function downloadPDF(filename, svgContent, row) {
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    const img = new Image();
+    const margin = 36;
+    const headerHeight = 100;
+    const tableTopY = 1000; // place the info table below drawing
+    console.log(row);
+
+    const logo = new Image();
+    logo.src = "../img/Monarch3Logo.png";
+
+    const svgImg = new Image();
     const svgBlob = new Blob([svgContent], { type: "image/svg+xml" });
     const url = URL.createObjectURL(svgBlob);
+    svgImg.src = url;
 
-    img.onload = function () {
-      // Set canvas size to SVG size
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 100);
+    Promise.all([
+      new Promise(res => (logo.onload = () => res())),
+      new Promise(res => (svgImg.onload = () => res()))
+    ]).then(() => {
+      // --- Render SVG into canvas ---
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = svgImg.width;
+      canvas.height = svgImg.height;
+      ctx.drawImage(svgImg, 0, 0);
 
-      // Create PDF after canvas is ready
+      // --- Create PDF ---
       const pdf = new jspdf.jsPDF("l", "pt", [canvas.width, canvas.height]);
       const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
 
-      // Draw the Custom Part Name on the PDF
+      // --- Logo ---
+      const logoHeight = 100;
+      const logoWidth = (logo.width / logo.height) * logoHeight;
+      const topY = margin;
+
+      // logo at top
+      pdf.addImage(logo, "PNG", margin, topY, logoWidth, logoHeight);
+
+      // header text also aligned to same topY
+      pdf.setFontSize(30);
+      pdf.text("Order Summary", pageWidth - margin, topY + 30, { align: "right" });
+
+      pdf.setFontSize(18);
+      pdf.text(new Date().toLocaleDateString(), pageWidth - margin, topY + 60, { align: "right" });
+
+      // --- Custom Part Name ---
       if (row && row["Custom Part Name"]) {
-        pdf.setFontSize(50);
-        pdf.setTextColor(179, 0, 0);
-        pdf.text(row["Custom Part Name"], pageWidth / 2, 56, { align: "center" });
+        pdf.setFontSize(40);
         pdf.setTextColor(0, 0, 0);
+        pdf.text(row["Custom Part Name"], pageWidth / 2, margin + headerHeight + 40, {
+          align: "center"
+        });
+      }
+      // --- SVG Drawing ---
+      const maxSvgWidth = pageWidth * 0.98; // increase max width (bigger image)
+      const scale = maxSvgWidth / canvas.width;
+      const svgWidth = canvas.width * scale;
+      const svgHeight = canvas.height * scale;
+
+      // align left of SVG with left of logo
+      const svgX = margin;  // same as logo's left
+      const svgTop = margin + headerHeight + 80;
+
+      pdf.addImage(canvas, "PNG", svgX, svgTop, svgWidth, svgHeight);
+
+      let hole_size = 0;
+
+      switch (row?.["Z Clip Type"]) {
+        case "MF250":
+          hole_size = 203;
+          break;
+        case "MF375":
+          hole_size = 203;
+          break;
+        case "MF625":
+          hole_size = 203;
+          break;
+        case "MFSTR-050":
+          hole_size = 250;
+          break;
+        case "MFSTR-075":
+          hole_size = 250;
+          break;
+        case "MFSTR-0375":
+          hole_size = 250;
+          break;
       }
 
-      // Add the SVG image
-      pdf.addImage(canvas, "PNG", 150, 0, canvas.width, canvas.height);
+      // --- Info Table (headers across, values in one row) ---
+      const headers = [
+        "Customer",
+        "Quantity",
+        "Length",
+        "Spacing",
+        "Holes",
+        "Lead In",
+        "Price Per Piece",
+        "Price For Item",
+        "Weight",
+        "Material",
+        "Finish"
+      ];
+      const values = [
+        row?.["Company Name"] || "",
+        row?.Quantity || "",
+        row?.Length || "",
+        row?.["Spacing"] || "",
+        `${row?.["Hole Amount"]}, Ø.${hole_size}` || "",
+        row?.["Lead In For Piece"] || "",
+        row?.["Price Per Piece"] || "",
+        row?.["Price Per Item"] || "",
+        "2.675 lbmass",
+        "Aluminum 6063",
+        "Mill"
+      ];
 
-      // Save the PDF
+      // Filter out empty columns
+      // --- Filter out empty columns dynamically ---
+      let filtered = headers.map((h, i) => ({ header: h, value: values[i] }))
+        .filter(col => col.value !== "" && col.value != null);
+
+      const formattedHeaders = filtered.map(c => c.header);
+      const filteredValues = [filtered.map(c => c.value)]; // autoTable expects an array of rows
+
+      const tableWidth = pageWidth * 0.8; // 60% of page width
+      const centerX = (pageWidth - tableWidth) / 2; // center the table
+
+      pdf.autoTable({
+        head: [formattedHeaders],
+        body: filteredValues,
+        startY: tableTopY,
+        tableWidth: tableWidth,
+        styles: { fontSize: 18, cellPadding: 32, halign: "center", valign: "middle" },
+        headStyles: { fontSize: 20, fillColor: [179, 0, 0], textColor: 255, fontStyle: "bold" },
+        margin: { left: centerX, right: centerX }
+      });
+
+      
+
+      pdf.setFontSize(25);
+      pdf.text("Notes:", margin, 1300, { align: "left" });
+
       pdf.save(filename);
-
       URL.revokeObjectURL(url);
-    };
-
-    img.src = url;
+    });
   }
+
 
   //Render drawing buttons after table is built
   //renderDrawings(data.choices_array); //--> UNCOMMENT TO HAVE DATA RENDER
