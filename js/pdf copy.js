@@ -261,21 +261,6 @@ document.addEventListener("DOMContentLoaded", () => {
   //Render drawing buttons after table is built
   renderDrawings(data.choices_array); //--> UNCOMMENT TO HAVE DATA RENDER
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  //WORK HERE//
   const downloadBtn = document.getElementById("downloadPdfBtn");
 
   downloadBtn.addEventListener("click", () => {
@@ -305,39 +290,23 @@ document.addEventListener("DOMContentLoaded", () => {
       doc.setFontSize(18);
       doc.text(new Date().toLocaleDateString(), pageWidth - margin, topY + 60, { align: "right" });
 
-      // --- Company & Project Name (if available) ---
-      let headerInfoY = topY + logoHeight + 40;
-      if (data.choices_array?.length) {
-        const sample = data.choices_array[0];
-        let lines = [];
-        if (sample["Company Name"]) lines.push(`Company Name: ${sample["Company Name"]}`);
-        if (sample["Project Name"]) lines.push(`Project Name: ${sample["Project Name"]}`);
-        lines.push(`Estimator: `);
-
-        if (lines.length) {
-          doc.setFontSize(13);
-          lines.forEach((txt, idx) => {
-            doc.text(txt, margin, headerInfoY + idx * 25);
-          });
-          headerInfoY += lines.length * 20 + 10;
-        }
-      }
-
       // --- Summary Table ---
       const filteredHeaders = headers.filter(
         h => h !== "Company Name" && h !== "Z Clip Type" && h !== "Project Name"
       );
 
       const headerMapping = {
-        Quantity: "Quantity",
-        Length: "Length",
-        "Hole Amount": "Hole Amount",
+        Quantity: "Qty",
+        Length: "Len",
+        "Hole Amount": "Holes",
         "Lead In For Piece": "Lead In",
-        "Price Per Piece": "Price Per Piece",
-        "Price Per Item": "Total Price For Item "
+        "Price Per Piece": "Price Ea",
+        "Price Per Item": "Price Total"
       };
 
       const formattedHeaders = filteredHeaders.map(h => headerMapping[h] || h);
+
+      const headerInfoY = topY + logoHeight + 40;
 
       doc.autoTable({
         head: [formattedHeaders],
