@@ -98,6 +98,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const url = URL.createObjectURL(svgBlob);
     svgImg.src = url;
 
+
+
     Promise.all([
       new Promise(res => (logo.onload = () => res())),
       new Promise(res => (svgImg.onload = () => res()))
@@ -127,6 +129,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
       pdf.setFontSize(18);
       pdf.text(new Date().toLocaleDateString(), pageWidth - margin, topY + 60, { align: "right" });
+
+      let headerInfoY = topY + logoHeight + 40;
+      if (data.choices_array?.length) {
+        const sample = data.choices_array[0];
+        let lines = [];
+        if (sample["Company Name"]) lines.push(`Company Name: ${sample["Company Name"]}`);
+        if (sample["Project Name"]) lines.push(`Project Name: ${sample["Project Name"]}`);
+
+        if (lines.length) {
+          pdf.setFontSize(13);
+
+          // Company + Project on the right
+          lines.forEach((txt, idx) => {
+            pdf.text(txt, pageWidth - margin, (topY + 85) + idx * 25, { align: "right" });
+          });
+          Í
+          // Find the bottom Y of those lines
+          headerInfoY = (topY + 85) + (lines.length - 1) * 25;
+
+          // Add some spacing
+          headerInfoY += 30;
+        }
+      }
 
       // --- Custom Part Name ---
       if (row && row["Custom Part Name"]) {
