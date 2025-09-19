@@ -287,19 +287,6 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-  //WORK HERE//
   const downloadBtn = document.getElementById("downloadPdfBtn");
 
   downloadBtn.addEventListener("click", () => {
@@ -325,9 +312,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Header text
       doc.setFontSize(16);
-      doc.text("Order Summary", pageWidth - margin, topY + 30, { align: "right" });
+      doc.text("Order Summary", pageWidth - margin, topY + 20, { align: "right" });
       doc.setFontSize(10);
-      doc.text(new Date().toLocaleDateString(), pageWidth - margin, topY + 50, { align: "right" });
+      doc.text(new Date().toLocaleDateString(), pageWidth - margin, topY + 40, { align: "right" });
 
       // --- Company & Project Name (if available) ---
       let headerInfoY = topY + logoHeight + 40;
@@ -403,7 +390,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // --- Append per-row formatted pages ---
       const addDrawings = (index = 0) => {
+
         if (index >= data.choices_array.length) {
+
+          const totalPages = doc.internal.getNumberOfPages();
+          for (let p = 1; p <= totalPages; p++) {
+            doc.setPage(p);
+            doc.setFontSize(8);
+            doc.text(`Page ${p} of ${totalPages}`, pageWidth - margin, pageHeight - 20, { align: "right" });
+          }
+
           let companyName = data.choices_array[0]?.["Company Name"];
           let safeCompanyName = companyName
             ? companyName.replace(/[\/\\:*?"<>|]/g, "")
@@ -446,9 +442,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
           // --- Header text ---
           doc.setFontSize(15);
-          doc.text("Order Summary", pageWidth - margin, topY + 30, { align: "right" });
+          doc.text("Order Summary", pageWidth - margin, topY + 20, { align: "right" });
           doc.setFontSize(10);
-          doc.text(new Date().toLocaleDateString(), pageWidth - margin, topY + 50, { align: "right" });
+          doc.text(new Date().toLocaleDateString(), pageWidth - margin, topY + 40, { align: "right" });
 
           // --- Custom Part Name ---
           if (row && row["Custom Part Name"]) {
@@ -541,18 +537,11 @@ document.addEventListener("DOMContentLoaded", () => {
           doc.text(property_text, pageWidth / 2, pageHeight - 35, { align: "center" });
 
           // --- Page Number (bottom-right) ---
-          const pageCount = doc.internal.getNumberOfPages();
-          const pageCurrent = doc.internal.getCurrentPageInfo().pageNumber;
-          doc.setFontSize(8);
-          doc.text(`Page ${pageCurrent} of ${pageCount}`, pageWidth - margin, pageHeight - 20, { align: "right" });
 
           URL.revokeObjectURL(url);
           addDrawings(index + 1);
         });
-        const pageCount = doc.internal.getNumberOfPages();
-        const pageCurrent = doc.internal.getCurrentPageInfo().pageNumber;
-        doc.setFontSize(8);
-        doc.text(`Page ${pageCurrent} of ${pageCount}`, pageWidth - margin, pageHeight - 20, { align: "right" });
+
       };
 
       addDrawings();
