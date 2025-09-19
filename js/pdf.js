@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
           lines.forEach((txt, idx) => {
             pdf.text(txt, pageWidth - margin, (topY + 85) + idx * 25, { align: "right" });
           });
-          Í
+          
           // Find the bottom Y of those lines
           headerInfoY = (topY + 85) + (lines.length - 1) * 25;
 

@@ -477,9 +477,9 @@ function calculateSinglePrice(choices) {
       "Spacing": parseFloat(choices_data.spacing),
       "Hole Amount": parseInt(hole_amount),
       "Base Price Per Inch": formatPrice(price_per_inch_line),
+      "Quantity Price": formatPrice(quantity_price),
       "Price Per Piece": formatPrice(price_per_piece),
       "Price Per Item": formatPrice(total_line_price),
-      "Quantity Price": formatPrice(quantity_price)
     });
 
     console.log("\n");
@@ -642,9 +642,9 @@ function calculateMultiPrice(choices) {
       "Spacing": parseFloat(item.spacing),
       "Hole Amount": parseInt(item.hole_amount),
       "Base Price Per Inch": formatPrice(base_per_inch),
+      "Quantity Price": formatPrice(quantity_price),
       "Price Per Piece": formatPrice(per_run_per_inch),
       "Price Per Item": formatPrice(total_single),
-      "Quantity Price": formatPrice(quantity_price),
     };
 
     choice_info.push(unsorted_obj_answer);
