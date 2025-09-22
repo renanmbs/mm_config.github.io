@@ -388,7 +388,7 @@ function calculateSinglePrice(choices) {
   const choice_info = [];
   let total_inches_customer = 0;
 
-  console.log("Single Item Product Breakdown:");
+  console.log("SINGLE ITEM PRODUCT BREAKDOWN:");
   console.log("\n");
 
   for (const choices_data of choices) {
@@ -424,16 +424,16 @@ function calculateSinglePrice(choices) {
     // Quantity Price
     const quantity_price = getPrice(lengths_needed, choices_data.zclip);
 
-    console.log("Quantity price: $" + quantity_price.toFixed(2));
+    console.log("Bulk material price: $" + quantity_price.toFixed(2));
 
     // Material Price
     let material_price = lengths_needed * quantity_price;
 
-    console.log("Material price: $" + material_price.toFixed(2));
+    console.log("Total material price: $" + material_price.toFixed(2));
 
     if (choices_data.quantity < 100) {
       material_price += 25; // bulk material
-      console.log("Cut charge for less than 100 pieces: $" + material_price.toFixed(2));
+      console.log("Cut charge for less than 100 pieces: $" + 25);
     }
 
     // Cut Charge per piece
@@ -447,7 +447,7 @@ function calculateSinglePrice(choices) {
     // Total line price (material + punch + cut + setup)
     const total_line_price = material_price + (punch_charge_per_piece + cut_charge_per_piece) * choices_data.quantity + setup_fee; //50 setup fee
     console.log("Setup Fee: $" + setup_fee.toFixed(2));
-    console.log("Price per item: $" + total_line_price.toFixed(2));
+    console.log("Total Price per item: $" + total_line_price.toFixed(2));
 
     // Price per piece
     const price_per_piece = total_line_price / choices_data.quantity;
@@ -565,8 +565,9 @@ function calculateMultiPrice(choices) {
     sum_inches_customer += item.length * item.quantity;
   }
 
-  console.log("Multiple Item Product Breakdown:");
+  console.log("MULTIPLE ITEM PRODUCT BREAKDOWN" );
   console.log("\n");
+  console.log(`${choices[0]?.zclip}:`);
   console.log(`Total inches: ${sum_inches_customer}"`);
 
   total_lengths = packParts(allParts, total_length_stock);
@@ -575,7 +576,7 @@ function calculateMultiPrice(choices) {
   const groupType = choices[0]?.zclip;
   const quantity_price = getPrice(total_lengths, groupType);
 
-  console.log("Quantity price: $" + quantity_price);
+  console.log("Bulk material price: $" + quantity_price);
 
   // Setup charge (quick calc)
   const setup_charge = setup_fee * piece_order_array.length;
@@ -599,9 +600,6 @@ function calculateMultiPrice(choices) {
   let base_pool = (quantity_price * total_lengths) + setup_charge + cut_charge_total;
   let base_per_inch = parseFloat((base_pool / sum_inches_customer).toFixed(2));
 
-  console.log("Price per inch: $" + base_per_inch);
-  console.log("\n");
-
   const choice_info = [];
 
   // Per-item prices
@@ -613,6 +611,7 @@ function calculateMultiPrice(choices) {
     // Name
     let custom_name = name_part(item);
 
+    console.log("\n");
     console.log(custom_name);
     console.log(`Punch charge: $${punch_charge}`);
 
@@ -625,7 +624,8 @@ function calculateMultiPrice(choices) {
     let per_run_per_inch = (item.length * base_per_inch) + punch_charge + cut_charge;
     per_run_per_inch = parseFloat(per_run_per_inch.toFixed(2));
 
-    console.log(`Price per item per piece: $${per_run_per_inch}`);
+    console.log("Price per inch: $" + base_per_inch);
+    console.log(`Price per piece: $${per_run_per_inch}`);
 
     // Total price for that line
     let total_single = parseFloat((per_run_per_inch * item.quantity).toFixed(2));

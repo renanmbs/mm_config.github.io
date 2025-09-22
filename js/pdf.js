@@ -17,11 +17,27 @@ document.addEventListener("DOMContentLoaded", () => {
       : true
   );
 
-  table.innerHTML =
-    `<tr>${headers.map(h => `<th>${h}</th>`).join("")}<th>Drawing</th></tr>` +
-    data.choices_array.map(row =>
-      `<tr>${headers.map(h => `<td>${row[h] != null ? row[h] : ""}</td>`).join("")}</tr>`
-    ).join("");
+  const skipCols = ["Base Price Per Inch", "Quantity Price"];
+  const headerMapping = {
+  "Price Per Item": "Total Price Per Item"
+  // you can add other mappings if you want to rename them
+};
+
+ table.innerHTML =
+  `<tr>${headers
+    .filter(h => !skipCols.includes(h))
+    .map(h => `<th>${headerMapping[h] ?? h}</th>`) // use mapped name or original
+    .join("")}<th>Drawing</th></tr>` +
+  data.choices_array
+    .map(
+      row =>
+        `<tr>${headers
+          .filter(h => !skipCols.includes(h))
+          .map(h => `<td>${row[h] != null ? row[h] : ""}</td>`)
+          .join("")}</tr>`
+    )
+    .join("");
+
 
   // --- Show total ---
   const totalDiv = document.getElementById("total");
@@ -40,22 +56,39 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   //Generate SVG drawing for Zclip
-  function generateSVG(template, row) {
-    let svg = template
-      .replace(/{leadin}/g, formatNumber(row["Lead In For Piece"]))
-      .replace(/{length}/g, formatNumber(row["Length"]))
-      .replace(/{spacing}/g, formatNumber(row["Spacing"]));
+function generateSVG(template, row) {
+  let svg = template;
 
-    //Only replace holes if > 0
-    if (parseInt(row["Hole Amount"], 10) > 0) {
-      svg = svg.replace(/{holes}/g, row["Hole Amount"]);
-    }
-    else {
-      //Remove the whole ", {holes}X" text
-      svg = svg.replace(/, <tspan[^>]*>\{holes\}X<\/tspan>/g, "");
-    }
-    return svg;
+  // Lead in
+  const leadIn = parseFloat(row["Lead In For Piece"]);
+  svg = svg.replace(
+    /{leadin}/g,
+    leadIn > 0 ? formatNumber(leadIn) : ""
+  );
+
+  // Length (always keep)
+  svg = svg.replace(/{length}/g, formatNumber(row["Length"]));
+
+  // Spacing
+  const spacing = parseFloat(row["Spacing"]);
+  svg = svg.replace(
+    /{spacing}/g,
+    spacing > 0 ? formatNumber(spacing) : ""
+  );
+
+  // Holes
+  if (parseInt(row["Hole Amount"], 10) > 0) {
+    svg = svg.replace(/{holes}/g, row["Hole Amount"]);
+  } else {
+    // Replace the whole hole callout with "No Holes"
+    svg = svg.replace(
+      /Ø\.\d+\s+THRU, <tspan[^>]*>\{holes\}X<\/tspan>/g,
+      "No Holes"
+    );
   }
+
+  return svg;
+}
 
   //Render Drawing for specific rows
   async function renderDrawings(results) {
@@ -144,7 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
           lines.forEach((txt, idx) => {
             pdf.text(txt, pageWidth - margin, (topY + 85) + idx * 25, { align: "right" });
           });
-          
+
           // Find the bottom Y of those lines
           headerInfoY = (topY + 85) + (lines.length - 1) * 25;
 
@@ -220,9 +253,11 @@ document.addEventListener("DOMContentLoaded", () => {
           break;
       }
 
+      const holeAmount =
+  row?.["Hole Amount"] > 0 ? `${row["Hole Amount"]}, Ø.${hole_size}` : "None";
+
       // --- Info Table (headers across, values in one row) ---
       const headers = [
-        "Customer",
         "Quantity",
         "Length",
         "Spacing",
@@ -235,11 +270,10 @@ document.addEventListener("DOMContentLoaded", () => {
         "Finish"
       ];
       const values = [
-        row?.["Company Name"] || "",
         row?.Quantity || "",
         row?.Length || "",
         row?.["Spacing"] || "",
-        `${row?.["Hole Amount"]}, Ø.${hole_size}` || "",
+        holeAmount,
         row?.["Lead In For Piece"] || "",
         row?.["Price Per Piece"] || "",
         row?.["Price Per Item"] || "",
@@ -283,20 +317,26 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   //Render drawing buttons after table is built
-  //renderDrawings(data.choices_array); //--> UNCOMMENT TO HAVE DATA RENDER
+  renderDrawings(data.choices_array); //--> UNCOMMENT TO HAVE DATA RENDER
 
 
   function buildRowTableData(row, hole_size, weight) {
+    
     const headers = [
       "Customer", "Quantity", "Length", "Spacing", "Holes",
       "Lead In", "Price Per Piece", "Total Price For Item", "Weight", "Material", "Finish"
     ];
+
+    // Build hole amount conditionally
+  const holeAmount =
+    row?.["Hole Amount"] > 0 ? `${row["Hole Amount"]}, Ø.${hole_size}` : "None";
+
     const values = [
       row?.["Company Name"] || "",
       row?.Quantity || "",
       row?.Length || "",
       row?.["Spacing"] || "",
-      `${row?.["Hole Amount"]}, Ø.${hole_size}` || "",
+      holeAmount,
       row?.["Lead In For Piece"] || "",
       row?.["Price Per Piece"] || "",
       row?.["Price Per Item"] || "",
@@ -372,8 +412,8 @@ document.addEventListener("DOMContentLoaded", () => {
         "Length",
         "Spacing",
         "Hole Amount",
-        "Base Price Per Inch",
-        "Quantity Price",       // becomes "Bulk Price"
+        // "Base Price Per Inch",
+        // "Quantity Price",       // becomes "Bulk Price"
         "Price Per Piece",
         "Price Per Item"
       ];
