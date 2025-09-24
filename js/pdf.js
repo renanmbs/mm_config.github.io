@@ -19,24 +19,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const skipCols = ["Base Price Per Inch", "Quantity Price"];
   const headerMapping = {
-  "Price Per Item": "Total Price Per Item"
-  // you can add other mappings if you want to rename them
-};
+    "Price Per Item": "Total Price Per Item"
+    // you can add other mappings if you want to rename them
+  };
 
- table.innerHTML =
-  `<tr>${headers
-    .filter(h => !skipCols.includes(h))
-    .map(h => `<th>${headerMapping[h] ?? h}</th>`) // use mapped name or original
-    .join("")}<th>Drawing</th></tr>` +
-  data.choices_array
-    .map(
-      row =>
-        `<tr>${headers
-          .filter(h => !skipCols.includes(h))
-          .map(h => `<td>${row[h] != null ? row[h] : ""}</td>`)
-          .join("")}</tr>`
-    )
-    .join("");
+  table.innerHTML =
+    `<tr>${headers
+      .filter(h => !skipCols.includes(h))
+      .map(h => `<th>${headerMapping[h] ?? h}</th>`) // use mapped name or original
+      .join("")}<th>Drawing</th></tr>` +
+    data.choices_array
+      .map(
+        row =>
+          `<tr>${headers
+            .filter(h => !skipCols.includes(h))
+            .map(h => `<td>${row[h] != null ? row[h] : ""}</td>`)
+            .join("")}</tr>`
+      )
+      .join("");
 
 
   // --- Show total ---
@@ -56,39 +56,39 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   //Generate SVG drawing for Zclip
-function generateSVG(template, row) {
-  let svg = template;
+  function generateSVG(template, row) {
+    let svg = template;
 
-  // Lead in
-  const leadIn = parseFloat(row["Lead In For Piece"]);
-  svg = svg.replace(
-    /{leadin}/g,
-    leadIn > 0 ? formatNumber(leadIn) : ""
-  );
-
-  // Length (always keep)
-  svg = svg.replace(/{length}/g, formatNumber(row["Length"]));
-
-  // Spacing
-  const spacing = parseFloat(row["Spacing"]);
-  svg = svg.replace(
-    /{spacing}/g,
-    spacing > 0 ? formatNumber(spacing) : ""
-  );
-
-  // Holes
-  if (parseInt(row["Hole Amount"], 10) > 0) {
-    svg = svg.replace(/{holes}/g, row["Hole Amount"]);
-  } else {
-    // Replace the whole hole callout with "No Holes"
+    // Lead in
+    const leadIn = parseFloat(row["Lead In For Piece"]);
     svg = svg.replace(
-      /Ø\.\d+\s+THRU, <tspan[^>]*>\{holes\}X<\/tspan>/g,
-      "No Holes"
+      /{leadin}/g,
+      leadIn > 0 ? formatNumber(leadIn) : ""
     );
-  }
 
-  return svg;
-}
+    // Length (always keep)
+    svg = svg.replace(/{length}/g, formatNumber(row["Length"]));
+
+    // Spacing
+    const spacing = parseFloat(row["Spacing"]);
+    svg = svg.replace(
+      /{spacing}/g,
+      spacing > 0 ? formatNumber(spacing) : ""
+    );
+
+    // Holes
+    if (parseInt(row["Hole Amount"], 10) > 0) {
+      svg = svg.replace(/{holes}/g, row["Hole Amount"]);
+    } else {
+      // Replace the whole hole callout with "No Holes"
+      svg = svg.replace(
+        /Ø\.\d+\s+THRU, <tspan[^>]*>\{holes\}X<\/tspan>/g,
+        "No Holes"
+      );
+    }
+
+    return svg;
+  }
 
   //Render Drawing for specific rows
   async function renderDrawings(results) {
@@ -254,7 +254,7 @@ function generateSVG(template, row) {
       }
 
       const holeAmount =
-  row?.["Hole Amount"] > 0 ? `${row["Hole Amount"]}, Ø.${hole_size}` : "None";
+        row?.["Hole Amount"] > 0 ? `${row["Hole Amount"]}, Ø.${hole_size}` : "None";
 
       // --- Info Table (headers across, values in one row) ---
       const headers = [
@@ -321,15 +321,15 @@ function generateSVG(template, row) {
 
 
   function buildRowTableData(row, hole_size, weight) {
-    
+
     const headers = [
       "Customer", "Quantity", "Length", "Spacing", "Holes",
       "Lead In", "Price Per Piece", "Total Price For Item", "Weight", "Material", "Finish"
     ];
 
     // Build hole amount conditionally
-  const holeAmount =
-    row?.["Hole Amount"] > 0 ? `${row["Hole Amount"]}, Ø.${hole_size}` : "None";
+    const holeAmount =
+      row?.["Hole Amount"] > 0 ? `${row["Hole Amount"]}, Ø.${hole_size}` : "None";
 
     const values = [
       row?.["Company Name"] || "",
@@ -399,10 +399,7 @@ function generateSVG(template, row) {
         }
       }
 
-      // --- Summary Table ---
-      const filteredHeaders = headers.filter(
-        h => h !== "Company Name" && h !== "Z Clip Type" && h !== "Project Name"
-      );
+      // --- Summary Table -->
 
       const summaryHeaders = [
         "Custom Part Name",
