@@ -337,6 +337,7 @@ const pricingTiers_MFSTR_075 = [
   { max: Infinity, price: 77.11 }
 ];
 
+//Set up fee
 let setup_fee = 50;
 
 function computeHoleData(length, spacing) {
@@ -441,12 +442,23 @@ function calculateSinglePrice(choices) {
     if (cut_charge_per_piece !== 0) console.log(`Cut charge for 100+ pieces: $${cut_charge_per_piece.toFixed(2)}`);
 
     // Punch Charge
-    const punch_charge_per_piece = hole_amount > 0 ? Math.max(hole_amount * 0.25, 0.55) : 0;
+    let punch_charge_per_piece = 0;
+    if (choices_data.spacing !== 0) {
+      punch_charge_per_piece = hole_amount > 0 ? Math.max(hole_amount * 0.25, 0.55) : 0;
+    }
+    else {
+      punch_charge_per_piece = 0;
+    }
     console.log(`Punch charge: $${punch_charge_per_piece.toFixed(2)}`);
 
     // Total line price (material + punch + cut + setup)
-    const total_line_price = material_price + (punch_charge_per_piece + cut_charge_per_piece) * choices_data.quantity + setup_fee; //50 setup fee
-    console.log("Setup Fee: $" + setup_fee.toFixed(2));
+    let setup_charge = choices_data.spacing === 0 ? 0 : setup_fee;
+
+    const total_line_price = material_price
+      + ((punch_charge_per_piece + cut_charge_per_piece) * choices_data.quantity)
+      + setup_charge;
+
+    console.log("Setup Fee: $" + setup_charge.toFixed(2));
     console.log("Total Price per item: $" + total_line_price.toFixed(2));
 
     // Price per piece
@@ -565,7 +577,7 @@ function calculateMultiPrice(choices) {
     sum_inches_customer += item.length * item.quantity;
   }
 
-  console.log("MULTIPLE ITEM PRODUCT BREAKDOWN" );
+  console.log("MULTIPLE ITEM PRODUCT BREAKDOWN");
   console.log("\n");
   console.log(`${choices[0]?.zclip}:`);
   console.log(`Total inches: ${sum_inches_customer}"`);
@@ -578,10 +590,10 @@ function calculateMultiPrice(choices) {
 
   console.log("Bulk material price: $" + quantity_price);
 
-  // Setup charge (quick calc)
-  const setup_charge = setup_fee * piece_order_array.length;
+  const setup_count = piece_order_array.filter(i => i.spacing !== 0).length;
+  const setup_charge = setup_count * setup_fee; // only charge for non-zero spacing lines
 
-  console.log("Setup Fee: $" + setup_charge);
+  console.log(`Setup Fee: $${setup_charge} (${setup_count} lines × $${setup_fee})`);
 
   // Base price per inch calculation (before per-item loop)
   let cut_charge_total = 0;
@@ -605,8 +617,10 @@ function calculateMultiPrice(choices) {
   // Per-item prices
   for (const item of piece_order_array) {
     // Punch charge per item
-    let punch_charge = item.hole_amount * 0.25;
-    if (punch_charge < 0.55) punch_charge = 0.55;
+    let punch_charge = 0;
+    if (item.spacing !== 0 && item.hole_amount > 0) {
+      punch_charge = Math.max(item.hole_amount * 0.25, 0.55);
+    }
 
     // Name
     let custom_name = name_part(item);
