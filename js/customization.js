@@ -398,11 +398,11 @@ function calculateLeadIn(choices) {
   return { choices_holes };
 }
 
+// Handle optimize button click
 document.addEventListener("click", (e) => {
   if (!e.target.classList.contains("toggle-btn")) return;
 
   const btn = e.target;
-
   const inputGroup = btn.closest(".input-group");
   if (!inputGroup) return;
 
@@ -426,9 +426,32 @@ document.addEventListener("click", (e) => {
   // Store optimized value internally (do not change input visually)
   lengthInput.dataset.optimizedValue = !isOptimized
     ? currentValue + 0.125
-    : currentValue;
+    : undefined;
 
-  console.log("Optimized value:", lengthInput.dataset.optimizedValue);
+  if (!isOptimized) {
+    console.log("Optimized value set:", lengthInput.dataset.optimizedValue);
+  } else {
+    console.log("Optimized value cleared");
+  }
+});
+
+// Handle manual input changes
+document.addEventListener("input", (e) => {
+  const input = e.target;
+  if (input.name !== "len") return;
+
+  const choice = input.closest(".user_choice1");
+  if (!choice) return;
+
+  // If user manually changes length, clear optimized value
+  if (input.dataset.optimizedValue) {
+    delete input.dataset.optimizedValue;
+    const toggleBtn = choice.querySelector(".toggle-btn");
+    if (toggleBtn) {
+      toggleBtn.dataset.optimized = "false";
+      toggleBtn.classList.remove("optimized-btn");
+    }
+  }
 });
 
 // Calculate Single Price
