@@ -243,45 +243,45 @@ option {
   line-height: 1;
 }
 
-/* Tooltip applied directly on label */
-label.tooltip {
-  position: relative; /* allows absolute positioning for tooltip */
+/* Tooltip applied to any element with class "tooltip" */
+.tooltip {
+  position: relative; /* for the tooltip pseudo-element */
   display: inline-block;
+  cursor: pointer; /* optional, gives hover feedback */
+  text-align: left; /* keeps text alignment */
 }
 
-label.tooltip::after {
+.tooltip::after {
   content: attr(data-tooltip);
   position: absolute;
-  bottom: 125%; /* positions above the label */
-  left: 0; /* aligns with the label start */
-  transform: none;
+  bottom: 125%; /* positions above the element */
+  left: 0;       /* aligns with element start */
   background: white;
   color: #333;
   padding: 0.75rem 1rem;
   border-radius: 8px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-  width: max-content;
-  min-width: 150px; /* optional, keeps tooltip readable */
   font-size: 0.9rem;
-  z-index: 100;
+  min-width: 150px; /* optional, keeps tooltip readable */
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.3s ease;
+  z-index: 100;
+  font-weight: bold;
 }
 
-label.tooltip:hover::after {
+.tooltip:hover::after {
   opacity: 1;
-}
-
-/* Maintain previous tooltip text alignment */
-.tooltip {
-  text-align: left;
 }
 
 .with-reset .reset-field:hover {
   color: red;
   background-color: transparent;
+}
+
+.toggle-btn.optimized-btn {
+  color: rgb(179, 0, 0);
 }
 
 .hole_radio input[type="radio"] {
@@ -341,4 +341,19 @@ details span {
 
 .tooltip {
   text-align: left;
+}
+
+.toggle-btn{
+  background-color: transparent !important;
+  margin: 0 !important;
+  width: auto !important;
+  padding: 0 !important;
+  font-style: italic !important;
+  text-decoration: none !important;
+  font-size: 0.8rem !important;
+}
+
+.toggle-btn:hover{
+  color: rgba(179, 0, 0, 0.828) !important;
+  text-decoration: underline !important;
 }

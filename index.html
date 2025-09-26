@@ -20,7 +20,11 @@
       <li>The answers will show up on a separate page, and you will be able to download the results in PDF</li>
       <li>To reset the page, utilize the "Clear All Fields" button</li>
       <li>Click the Monarch Metal logo on the results page to be redirected to the home page</li>
-      <li>For details like cut/punch charges, total inches, and setup fee, check the console (⋮ → More tools → Developer tools → Console)
+      <li>For details like cut/punch charges, total inches, and setup fee, check the console (⋮ → More tools → Developer
+        tools → Console)</li>
+      <li>For optimized full lengths, click the "Optimize Length" button to consider the saw blade thickness.
+        <li>Red: Optimization is on</li>
+        <li>Black: Optimization is off</li>
       </li>
     </ul>
   </details>
@@ -84,12 +88,19 @@
           <div class="input-row">
 
             <div class="input-group">
-              <label for="len" class="tooltip" data-tooltip='Spacing must be in 0.25" increments'>
-                Length <span class="span2">(Inches)</span>
-                <span class="req">*</span>
-              </label>
+              <div class="label-row">
+                <label for="len" class="tooltip" data-tooltip='Length must be in 0.125" increments'>
+                  Length <span class="span2">(Inches)</span>
+                  <span class="req">*</span>
+                </label>
 
-              <input type="number" name="len" min="1.5" max="144" step="0.25" placeholder='Choose from 1.5" to 144"'
+                <button type="button" class="toggle-btn tooltip"
+                  data-tooltip='Click here to account for the saw cut thickness' aria-pressed="false" id="toggle-btn">
+                  Optimize Length
+                </button>
+              </div>
+
+              <input type="number" name="len" min="1.5" max="144" step="0.125" placeholder='Choose from 1.5" to 144"'
                 id="len" required />
 
             </div>

@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const lengthInput = choice.querySelector('input[name="len"]');
       const lenVal = parseFloat(lengthInput.value);
 
-      if (!isIncrement(lenVal, 1.5, 0.25)) {
+      if (!isIncrement(lenVal, 1.5, 0.125)) {
         isValid = false;
         lengthInput.setCustomValidity("Length must be in 0.25\" increments starting from 1.5\".");
         lengthInput.reportValidity();
@@ -234,14 +234,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
       <div class="input-row">
 
-            <div class="input-group">
-              <label for="len" class="tooltip" data-tooltip='Spacing must be in 0.25" increments'>
-                Length <span class="span2">(Inches)</span>
-                <span class="req">*</span>
-              </label>
+            <div class="input-row">
 
-              <input type="number" name="len" min="1.5" max="144" step="0.25" placeholder='Choose from 1.5" to 144"'
+            <div class="input-group">
+              <div class="label-row">
+                <label for="len" class="tooltip" data-tooltip='Spacing must be in 0.125" increments'>
+                  Length <span class="span2">(Inches)</span>
+                  <span class="req">*</span>
+                </label>
+
+                <button type="button" class="toggle-btn tooltip"
+                  data-tooltip='Click here to account for the saw cut thickness' aria-pressed="false" id="toggle-btn">
+                  Optimize Length
+                </button>
+              </div>
+
+              <input type="number" name="len" min="1.5" max="144" step="0.125" placeholder='Choose from 1.5" to 144"'
                 id="len" required />
+
             </div>
 
             <div class="input-group">
@@ -272,10 +282,14 @@ document.addEventListener("DOMContentLoaded", () => {
     userChoiceContainer.querySelectorAll(".user_choice1").forEach(choice => {
       const zclip = choice.querySelector('select[name="zclip"]').value;
       const quantity = parseInt(choice.querySelector('input[name="quant"]').value);
-      const length = parseFloat(choice.querySelector('input[name="len"]').value);
+      const lengthInput = choice.querySelector('input[name="len"]');
+      const length = lengthInput.dataset.optimizedValue
+        ? parseFloat(lengthInput.dataset.optimizedValue)
+        : parseFloat(lengthInput.value);
       const spacing = parseFloat(choice.querySelector('input[name="space"]').value);
+      const toggleBtn = choice.querySelector('.toggle-btn');
 
-      choices.push({ zclip, quantity, length, spacing, companyName, projectName });
+      choices.push({ zclip, quantity, length, spacing, companyName, projectName, _toggleBtn: toggleBtn });
     });
 
     let total = calculateOrder(choices);
@@ -384,6 +398,39 @@ function calculateLeadIn(choices) {
   return { choices_holes };
 }
 
+document.addEventListener("click", (e) => {
+  if (!e.target.classList.contains("toggle-btn")) return;
+
+  const btn = e.target;
+
+  const inputGroup = btn.closest(".input-group");
+  if (!inputGroup) return;
+
+  const lengthInput = inputGroup.querySelector('input[name="len"]');
+  if (!lengthInput) return;
+
+  const currentValue = parseFloat(lengthInput.value) || 0;
+
+  // Alert if length is 144
+  if (currentValue === 144) {
+    alert("Length 144 cannot be optimized.");
+    return;
+  }
+
+  const isOptimized = btn.dataset.optimized === "true";
+
+  // Toggle optimized state
+  btn.dataset.optimized = (!isOptimized).toString();
+  btn.classList.toggle("optimized-btn", !isOptimized);
+
+  // Store optimized value internally (do not change input visually)
+  lengthInput.dataset.optimizedValue = !isOptimized
+    ? currentValue + 0.125
+    : currentValue;
+
+  console.log("Optimized value:", lengthInput.dataset.optimizedValue);
+});
+
 // Calculate Single Price
 function calculateSinglePrice(choices) {
   const choice_info = [];
@@ -399,17 +446,17 @@ function calculateSinglePrice(choices) {
     );
 
     // Single Yield
-    let singleYield;
-    switch (choices_data.length) {
-      case 12: singleYield = 11.875; break;
-      case 18: singleYield = 17.875; break;
-      case 24: singleYield = 23.875; break;
-      case 36: singleYield = 35.875; break;
-      case 48: singleYield = 47.875; break;
-      case 140: singleYield = 139.875; break;
-      case 144: singleYield = 143.875; break;
-      default: singleYield = choices_data.length + 0.125;
-    }
+    let singleYield = choices_data.length;
+    // switch (choices_data.length) {
+    //   case 12: singleYield = 11.875; break;
+    //   case 18: singleYield = 17.875; break;
+    //   case 24: singleYield = 23.875; break;
+    //   case 36: singleYield = 35.875; break;
+    //   case 48: singleYield = 47.875; break;
+    //   case 140: singleYield = 139.875; break;
+    //   case 144: singleYield = 143.875; break;
+    //   default: singleYield = choices_data.length + 0.125;
+    // }
 
     console.log(choices_data.zclip + ":");
 
@@ -593,7 +640,7 @@ function calculateMultiPrice(choices) {
   const setup_count = piece_order_array.filter(i => i.spacing !== 0).length;
   const setup_charge = setup_count * setup_fee; // only charge for non-zero spacing lines
 
-  console.log(`Setup Fee: $${setup_charge} (${setup_count} lines × $${setup_fee})`);
+  console.log(`Setup Fee: $${setup_charge} (${setup_count} line(s) × $${setup_fee})`);
 
   // Base price per inch calculation (before per-item loop)
   let cut_charge_total = 0;
