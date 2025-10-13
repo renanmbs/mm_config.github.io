@@ -89,11 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!isValid) return;
 
     const data = gatherFormData();
-    // console.log("Form data:", data);
-    // alert("Check console for collected data.");
   });
-
-
 
   // Live validation for length > spacing
   userChoiceContainer.addEventListener("input", (e) => {
@@ -205,7 +201,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let choiceCount = 0;
 
   function addUserChoice() {
-    // alert("Multi Product usability not finalized yet. Please use the single product options for now.");
     choiceCount++;
     const holeSizeGroupName = `hole_size_${choiceCount}`;
 
@@ -275,27 +270,39 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function gatherFormData() {
-    const companyName = form.querySelector("#comp_name").value.trim();
-    const projectName = form.querySelector("#proj_name").value.trim();
+  const companyName = form.querySelector("#comp_name").value.trim();
+  const projectName = form.querySelector("#proj_name").value.trim();
 
-    const choices = [];
-    userChoiceContainer.querySelectorAll(".user_choice1").forEach(choice => {
-      const zclip = choice.querySelector('select[name="zclip"]').value;
-      const quantity = parseInt(choice.querySelector('input[name="quant"]').value);
-      const lengthInput = choice.querySelector('input[name="len"]');
-      const length = lengthInput.dataset.optimizedValue
-        ? parseFloat(lengthInput.dataset.optimizedValue)
-        : parseFloat(lengthInput.value);
-      const spacing = parseFloat(choice.querySelector('input[name="space"]').value);
-      const toggleBtn = choice.querySelector('.toggle-btn');
+  const choices = [];
+  userChoiceContainer.querySelectorAll(".user_choice1").forEach(choice => {
+    const zclip = choice.querySelector('select[name="zclip"]').value;
+    const quantity = parseInt(choice.querySelector('input[name="quant"]').value, 10);
+    const lengthInput = choice.querySelector('input[name="len"]');
 
-      choices.push({ zclip, quantity, length, spacing, companyName, projectName, _toggleBtn: toggleBtn });
+    const rawOpt = lengthInput.dataset.optimizedValue;
+    const length = rawOpt && !isNaN(parseFloat(rawOpt))
+      ? parseFloat(rawOpt)
+      : parseFloat(lengthInput.value);
+
+    const spacing = parseFloat(choice.querySelector('input[name="space"]').value);
+    const toggleBtn = choice.querySelector('.toggle-btn');
+
+    choices.push({
+      zclip,
+      quantity,
+      length,
+      spacing,
+      companyName,
+      projectName,
+      _toggleBtn: toggleBtn
     });
+  });
 
-    let total = calculateOrder(choices);
+  const total = calculateOrder(choices);
+  return { companyName, projectName, total, choices };
+}
 
-    return { companyName, projectName, total, choices };
-  }
+
 });
 
 // Reset individual inputs outside DOMContentLoaded
@@ -313,42 +320,42 @@ document.querySelectorAll(".reset-field").forEach(btn => {
 // Database of pricing tiers
 const pricingTiers_MF625 = [
   { max: 19, price: 27.30 },
-  { max: 39, price: 25.37 },
-  { max: 79, price: 21.48 },
-  { max: 159, price: 20.52 },
-  { max: Infinity, price: 20.23 }
+  { max: 39, price: 25.39 },
+  { max: 79, price: 21.57 },
+  { max: 159, price: 20.48 },
+  { max: Infinity, price: 20.20 }
 ];
 
 const pricingTiers_MF250 = [
   { max: 19, price: 30.22 },
-  { max: 39, price: 28.28 },
-  { max: 79, price: 24.40 },
-  { max: 159, price: 23.43 },
-  { max: Infinity, price: 23.14 }
+  { max: 39, price: 28.41 },
+  { max: 79, price: 24.48 },
+  { max: 159, price: 23.57 },
+  { max: Infinity, price: 23.27 }
 ];
 
 const pricingTiers_MFSTR_050 = [
   { max: 19, price: 51.10 },
-  { max: 39, price: 49.23 },
-  { max: 79, price: 44.88 },
-  { max: 159, price: 38.78 },
-  { max: Infinity, price: 36.58 }
+  { max: 39, price: 49.57 },
+  { max: 79, price: 44.97 },
+  { max: 159, price: 38.84 },
+  { max: Infinity, price: 36.79 }
 ];
 
 const pricingTiers_MFSTR_0375 = [
   { max: 19, price: 72.22 },
-  { max: 39, price: 69.47 },
-  { max: 79, price: 63.47 },
-  { max: 159, price: 54.67 },
-  { max: Infinity, price: 51.65 }
+  { max: 39, price: 70.05 },
+  { max: 79, price: 63.55 },
+  { max: 159, price: 54.89 },
+  { max: Infinity, price: 52.00 }
 ];
 
 const pricingTiers_MFSTR_075 = [
   { max: 19, price: 107.69 },
-  { max: 39, price: 103.62 },
-  { max: 79, price: 94.66 },
-  { max: 159, price: 81.57 },
-  { max: Infinity, price: 77.11 }
+  { max: 39, price: 104.46 },
+  { max: 79, price: 94.77 },
+  { max: 159, price: 81.84 },
+  { max: Infinity, price: 77.54 }
 ];
 
 //Set up fee
@@ -400,37 +407,30 @@ function calculateLeadIn(choices) {
 
 // Handle optimize button click
 document.addEventListener("click", (e) => {
-  if (!e.target.classList.contains("toggle-btn")) return;
+  const btn = e.target.closest(".toggle-btn");
+  if (!btn) return;
 
-  const btn = e.target;
-  const inputGroup = btn.closest(".input-group");
-  if (!inputGroup) return;
+  const choice = btn.closest(".user_choice1");
+  if (!choice) return;
 
-  const lengthInput = inputGroup.querySelector('input[name="len"]');
-  if (!lengthInput) return;
-
+  const lengthInput = choice.querySelector('input[name="len"]');
   const currentValue = parseFloat(lengthInput.value) || 0;
-
-  // Alert if length is 144
-  if (currentValue === 144) {
-    alert("Length 144 cannot be optimized.");
-    return;
-  }
-
   const isOptimized = btn.dataset.optimized === "true";
+
+  if (currentValue === 144) {
+    alert("Z-clip length cannot exceed 144 inches.");
+    return; // stop further processing
+  }
 
   // Toggle optimized state
   btn.dataset.optimized = (!isOptimized).toString();
   btn.classList.toggle("optimized-btn", !isOptimized);
 
-  // Store optimized value internally (do not change input visually)
-  lengthInput.dataset.optimizedValue = !isOptimized
-    ? currentValue + 0.125
-    : undefined;
-
   if (!isOptimized) {
+    lengthInput.dataset.optimizedValue = String(currentValue + 0.125);
     console.log("Optimized value set:", lengthInput.dataset.optimizedValue);
   } else {
+    lengthInput.removeAttribute("data-optimized-value");
     console.log("Optimized value cleared");
   }
 });
@@ -443,16 +443,19 @@ document.addEventListener("input", (e) => {
   const choice = input.closest(".user_choice1");
   if (!choice) return;
 
-  // If user manually changes length, clear optimized value
   if (input.dataset.optimizedValue) {
-    delete input.dataset.optimizedValue;
+    input.removeAttribute("data-optimized-value"); // Correct DOM-safe way
+
     const toggleBtn = choice.querySelector(".toggle-btn");
     if (toggleBtn) {
       toggleBtn.dataset.optimized = "false";
       toggleBtn.classList.remove("optimized-btn");
     }
+
+    console.log("Manual change detected — optimization cleared");
   }
 });
+
 
 // Calculate Single Price
 function calculateSinglePrice(choices) {
@@ -469,17 +472,7 @@ function calculateSinglePrice(choices) {
     );
 
     // Single Yield
-    let singleYield = choices_data.length;
-    // switch (choices_data.length) {
-    //   case 12: singleYield = 11.875; break;
-    //   case 18: singleYield = 17.875; break;
-    //   case 24: singleYield = 23.875; break;
-    //   case 36: singleYield = 35.875; break;
-    //   case 48: singleYield = 47.875; break;
-    //   case 140: singleYield = 139.875; break;
-    //   case 144: singleYield = 143.875; break;
-    //   default: singleYield = choices_data.length + 0.125;
-    // }
+    let singleYield = choices_data.length - 0.125;
 
     console.log(choices_data.zclip + ":");
 
@@ -600,6 +593,7 @@ function getPrice(quantity, zclip_type) {
     default:
       throw new Error("Unknown zclip type: " + zclip_type);
   }
+  
   return getPrice_result;
 }
 
@@ -612,7 +606,7 @@ function capitalizeFirstLetter(string) {
 
 // Calculate Multiple Items Price
 function calculateMultiPrice(choices) {
-  // Build objects with computed hole data attached BEFORE sorting
+
   const piece_order_array = choices.map(c => {
     const hd = computeHoleData(c.length, c.spacing);
     return {
@@ -633,12 +627,8 @@ function calculateMultiPrice(choices) {
   let total_lengths = 0;
   let sum_inches_customer = 0;
 
-  // Compute packing and inches
   const total_length_stock = piece_order_array.length && piece_order_array[0].length < 6 ? 140 : 144;
 
-  //console.log("Total length stock " + total_length_stock);
-
-  // Build list of all parts for packing
   const allParts = [];
   for (const item of piece_order_array) {
     for (let q = 0; q < item.quantity; q++) {
@@ -661,57 +651,54 @@ function calculateMultiPrice(choices) {
   console.log("Bulk material price: $" + quantity_price);
 
   const setup_count = piece_order_array.filter(i => i.spacing !== 0).length;
-  const setup_charge = setup_count * setup_fee; // only charge for non-zero spacing lines
+  const setup_charge = setup_count * setup_fee;
 
   console.log(`Setup Fee: $${setup_charge} (${setup_count} line(s) × $${setup_fee})`);
 
-  // Base price per inch calculation (before per-item loop)
-  let cut_charge_total = 0;
+  const groupItems = piece_order_array.filter(item => item.zclip === groupType);
+  const total_group_quantity = groupItems.reduce((acc, item) => acc + item.quantity, 0);
 
-  // If any item has quantity < 100, add $25 to the base pool
-  if (piece_order_array.some(item => item.quantity < 100)) {
-    cut_charge_total = 25;
-    console.log("Cut charge for less than 100 pieces: $" + cut_charge_total);
+  let add_cut_charge_per_piece = false;
+  let flat_cut_charge_for_group = 0;
+
+  if (total_group_quantity >= 100) {
+    add_cut_charge_per_piece = true;
+    console.log("Cut charge rule: Group >= 100 → +$0.25 per piece");
+  } else {
+    flat_cut_charge_for_group = 25;
+    console.log("Cut charge rule: Group < 100 → +$25 flat added to base pool");
   }
 
   if (!total_lengths || !sum_inches_customer) {
-    return []; // or handle gracefully
+    return [];
   }
 
-  // Base price per inch
-  let base_pool = (quantity_price * total_lengths) + setup_charge + cut_charge_total;
+  let base_pool = (quantity_price * total_lengths) + setup_charge + flat_cut_charge_for_group;
   let base_per_inch = parseFloat((base_pool / sum_inches_customer).toFixed(2));
 
   const choice_info = [];
 
   // Per-item prices
   for (const item of piece_order_array) {
-    // Punch charge per item
     let punch_charge = 0;
     if (item.spacing !== 0 && item.hole_amount > 0) {
       punch_charge = Math.max(item.hole_amount * 0.25, 0.55);
     }
 
-    // Name
     let custom_name = name_part(item);
-
     console.log("\n");
     console.log(custom_name);
     console.log(`Punch charge: $${punch_charge}`);
 
-    // Cut charge per piece
-    let cut_charge = item.quantity >= 100 ? 0.25 : 0;
+    let cut_charge = add_cut_charge_per_piece ? 0.25 : 0;
+    if (cut_charge) console.log(`Cut charge applied per piece: $${cut_charge}`);
 
-    if (cut_charge !== 0) console.log(`Cut charge for 100+ pieces: $${cut_charge}`);
-
-    // Per run per inch
     let per_run_per_inch = (item.length * base_per_inch) + punch_charge + cut_charge;
     per_run_per_inch = parseFloat(per_run_per_inch.toFixed(2));
 
     console.log("Price per inch: $" + base_per_inch);
     console.log(`Price per piece: $${per_run_per_inch}`);
 
-    // Total price for that line
     let total_single = parseFloat((per_run_per_inch * item.quantity).toFixed(2));
 
     let unsorted_obj_answer = {
@@ -737,9 +724,9 @@ function calculateMultiPrice(choices) {
 
   let total_order_price = total_order(choice_info);
   total_order_price = total_order_price.toFixed(2);
-  //DO SOMETHING WITH TOTAL ORDER PRICE
   return choice_info;
 }
+
 
 // Sort alphabetically the object
 function sortObjectKeys(obj) {
@@ -808,32 +795,26 @@ function calculateOrder(choices) {
 
 //Recursion function to calculate the lengths needed reutilizing drop
 function packParts(parts, stockLength) {
-  // Sort parts descending (largest first, helps efficiency)
+
   parts.sort((a, b) => b - a);
 
   let barsUsed = 0;
 
   while (parts.length > 0) {
     let remaining = stockLength;
-
-    // Always start a new bar
     barsUsed++;
 
     for (let i = 0; i < parts.length;) {
       let part = parts[i];
 
       if (part <= remaining) {
-        // Fits → cut it
         remaining -= part;
         parts.splice(i, 1);
 
-        // If remainder is ≤ 6, scrap it and break
-        if (remaining <= 6) break;
-        //console.log("scrap under 6 inches");
-      }
-
-      else {
-        // Doesn’t fit → try next smaller part
+        if (remaining <= 6) {
+          break;
+        }
+      } else {
         i++;
       }
     }
