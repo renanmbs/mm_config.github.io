@@ -362,8 +362,6 @@ const pricingTiers_MFSTR_075 = [
 let setup_fee = 50;
 
 function computeHoleData(length, spacing) {
-  // holesBetween = number of spacings that actually fit strictly inside the length
-
   if (!spacing || parseFloat(spacing) === 0) {
     return {
       hole_amount: 0,
@@ -375,27 +373,29 @@ function computeHoleData(length, spacing) {
   let holesBetween = Math.floor(length / spacing);
 
   if (Number.isInteger(length / spacing)) {
-    // if spacing divides length exactly, there is one less interior spacing
     holesBetween -= 1;
   }
 
-  // total holes = interior spacings + 1
   let hole_amount = holesBetween + 1;
 
-  // total lead-in leftover across both ends
-  const totalLeadIn = length - (holesBetween * spacing);
+  let totalLeadIn = length - (holesBetween * spacing);
   let leadInForPiece = totalLeadIn / 2;
 
-  // enforce 0.5" minimum lead-in each end; if we bump, we must remove one hole
+  // enforce minimum lead-in of 0.5"
   if (leadInForPiece < 0.5) {
     leadInForPiece = 0.5;
     hole_amount -= 1;
   }
 
+  // round lead-in to nearest 1/16"
+  const roundTo = 1 / 16; // 0.0625
+  leadInForPiece = Math.round(leadInForPiece / roundTo) * roundTo;
+  totalLeadIn = leadInForPiece * 2;
+
   return {
     hole_amount,
     leadInForPiece,
-    leadIn: totalLeadIn, // total for both ends (you were logging this)
+    leadIn: totalLeadIn
   };
 }
 
@@ -842,17 +842,27 @@ function packParts(parts, stockLength) {
 
 //Naming part function
 function name_part(choice) {
-  const hole_diameter = .313;
-  const hd = hole_diameter.toString().replace(/^0+/, '');
+  // Determine the length to use for naming
+  // If the toggle optimization was applied, subtract 0.125
+  let lengthForName = choice.length;
+  if (choice._toggleBtn?.dataset.optimized === "true") {
+    lengthForName = parseFloat((choice.length - 0.125).toFixed(3));
+  }
 
-  let custom_name = `CUS-${choice.zclip}-${choice.length}`;
+  // Always round to nearest integer for naming
+  lengthForName = Math.round(lengthForName);
+
+  // Start building the custom part name
+  let custom_name = `CUS-${choice.zclip}-${lengthForName}`;
+
+  // Append spacing info if > 0
   if (choice.spacing && parseFloat(choice.spacing) > 0) {
     custom_name += `H${choice.spacing}`;
-    //diameter: + `_D${hd}`
   }
 
   return custom_name;
 }
+
 
 // Format price with commas and two decimals
 function formatPrice(value) {
@@ -884,5 +894,3 @@ function print_results(results_array, grand_total) {
 
   window.open("./html/calculation_results.html", "_blank");
 }
-
-// Remove 0.125 from custom name if optimized
