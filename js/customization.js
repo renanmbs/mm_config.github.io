@@ -675,6 +675,8 @@ function calculateMultiPrice(choices) {
 
   let base_pool = (quantity_price * total_lengths) + setup_charge + flat_cut_charge_for_group;
   let base_per_inch = parseFloat((base_pool / sum_inches_customer).toFixed(2));
+  // let base_per_inch = base_pool / sum_inches_customer;
+
 
   const choice_info = [];
 
@@ -795,33 +797,48 @@ function calculateOrder(choices) {
 
 //Recursion function to calculate the lengths needed reutilizing drop
 function packParts(parts, stockLength) {
+  const kerf = 0.125;      // saw kerf / cut loss between adjacent parts
+  const minRemaining = 6;  // if leftover <= minRemaining we stop filling that bar
 
-  parts.sort((a, b) => b - a);
+  // work on a copy sorted descending (good heuristic)
+  const work = parts.slice().sort((a, b) => b - a);
 
   let barsUsed = 0;
 
-  while (parts.length > 0) {
+  while (work.length > 0) {
     let remaining = stockLength;
     barsUsed++;
 
-    for (let i = 0; i < parts.length;) {
-      let part = parts[i];
+    let partCountOnBar = 0; // used to know whether to add kerf before a part
 
-      if (part <= remaining) {
-        remaining -= part;
-        parts.splice(i, 1);
+    // iterate over work array and try to place parts greedily
+    for (let i = 0; i < work.length; ) {
+      const part = work[i];
 
-        if (remaining <= 6) {
-          break;
-        }
+      // If it's not the first part on this bar, placing it costs an extra kerf
+      const needed = partCountOnBar > 0 ? part + kerf : part;
+
+      if (needed <= remaining) {
+        // place the part
+        remaining -= needed;
+        work.splice(i, 1);
+        partCountOnBar++;
+
+        // Respect the rule: stop filling if leftover <= minRemaining
+        if (remaining <= minRemaining) break;
+
+        // continue scanning from same index because we've removed this element
       } else {
+        // can't place this part here (too big), try next part
         i++;
       }
     }
+    // next bar (loop continues)
   }
 
   return barsUsed;
 }
+
 
 //Naming part function
 function name_part(choice) {
@@ -867,3 +884,5 @@ function print_results(results_array, grand_total) {
 
   window.open("./html/calculation_results.html", "_blank");
 }
+
+// Remove 0.125 from custom name if optimized
