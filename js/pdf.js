@@ -131,8 +131,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const url = URL.createObjectURL(svgBlob);
     svgImg.src = url;
 
-
-
     Promise.all([
       new Promise(res => (logo.onload = () => res())),
       new Promise(res => (svgImg.onload = () => res()))
@@ -157,11 +155,11 @@ document.addEventListener("DOMContentLoaded", () => {
       pdf.addImage(logo, "PNG", margin, topY, logoWidth, logoHeight);
 
       // header text also aligned to same topY
-      pdf.setFontSize(30);
-      pdf.text("Order Summary", pageWidth - margin, topY + 30, { align: "right" });
+      // pdf.setFontSize(30);
+      // pdf.text("Order Summary", pageWidth - margin, topY + 30, { align: "right" });
 
       pdf.setFontSize(18);
-      pdf.text(new Date().toLocaleDateString(), pageWidth - margin, topY + 60, { align: "right" });
+      pdf.text(new Date().toLocaleDateString(), pageWidth - margin, topY + 30, { align: "right" });
 
       let headerInfoY = topY + logoHeight + 40;
       if (data.choices_array?.length) {
@@ -258,25 +256,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // --- Info Table (headers across, values in one row) ---
       const headers = [
-        "Quantity",
-        "Length",
-        "Spacing",
-        "Holes",
-        "Lead In",
-        "Price Per Piece",
-        "Total Price For Item",
         "Weight",
         "Material",
         "Finish"
       ];
       const values = [
-        row?.Quantity || "",
-        row?.Length || "",
-        row?.["Spacing"] || "",
-        holeAmount,
-        row?.["Lead In For Piece"] || "",
-        row?.["Price Per Piece"] || "",
-        row?.["Price Per Item"] || "",
         `${weight} lbs`,
         "Aluminum 6063",
         "Mill"
