@@ -165,8 +165,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (data.choices_array?.length) {
         const sample = data.choices_array[0];
         let lines = [];
-        if (sample["Company Name"]) lines.push(`Company Name: ${sample["Company Name"]}`);
-        if (sample["Project Name"]) lines.push(`Project Name: ${sample["Project Name"]}`);
+        // if (sample["Company Name"]) lines.push(`Company Name: ${sample["Company Name"]}`);
+        // if (sample["Project Name"]) lines.push(`Project Name: ${sample["Project Name"]}`);
 
         if (lines.length) {
           pdf.setFontSize(13);
