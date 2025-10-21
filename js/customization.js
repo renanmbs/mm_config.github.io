@@ -480,25 +480,35 @@ function calculateSinglePrice(choices) {
 
     // Finished Parts per Stock Length
     const total_length_stock = choices_data.length < 6 ? 140 : 144;
-    const amount_finished_part = Math.floor(total_length_stock / singleYield);
+    console.log("Total Stock Length: " + total_length_stock);
+
+    // const amount_finished_part = Math.floor(total_length_stock / singleYield);
+    // console.log("Amount of finished parts: " + amount_finished_part);
+
+    const allParts = Array(choices_data.quantity).fill(choices_data.length);
+    const total_lengths = packParts(allParts, total_length_stock);
+    console.log("Full Lengths Needed: " + total_lengths);
 
     // Lengths Needed
-    const lengths_needed = Math.ceil(choices_data.quantity / amount_finished_part);
+    // const lengths_needed = Math.ceil(choices_data.quantity / amount_finished_part);
+    // console.log("Full Lengths Needed: " + lengths_needed);
 
     // Quantity Price
-    const quantity_price = getPrice(lengths_needed, choices_data.zclip);
+    const quantity_price = getPrice(total_lengths, choices_data.zclip);
 
     console.log("Bulk material price: $" + quantity_price.toFixed(2));
 
     // Material Price
-    let material_price = lengths_needed * quantity_price;
-
-    console.log("Total material price: $" + material_price.toFixed(2));
+    let material_price = total_lengths * quantity_price;
 
     if (choices_data.quantity < 100) {
       material_price += 25; // bulk material
       console.log("Cut charge for less than 100 pieces: $" + 25);
     }
+
+     // Total line price (material + punch + cut + setup)
+    let setup_charge = choices_data.spacing === 0 ? 0 : setup_fee;
+    material_price += setup_charge;
 
     // Cut Charge per piece
     const cut_charge_per_piece = choices_data.quantity >= 100 ? 0.25 : 0;
@@ -512,16 +522,14 @@ function calculateSinglePrice(choices) {
     else {
       punch_charge_per_piece = 0;
     }
-    console.log(`Punch charge: $${punch_charge_per_piece.toFixed(2)}`);
 
-    // Total line price (material + punch + cut + setup)
-    let setup_charge = choices_data.spacing === 0 ? 0 : setup_fee;
+     console.log("Total material price: $" + material_price.toFixed(2));
+     console.log(`Punch charge: $${punch_charge_per_piece.toFixed(2)}`);
+     console.log("Setup Fee: $" + setup_charge.toFixed(2));
 
     const total_line_price = material_price
-      + ((punch_charge_per_piece + cut_charge_per_piece) * choices_data.quantity)
-      + setup_charge;
+      + ((punch_charge_per_piece + cut_charge_per_piece) * choices_data.quantity);
 
-    console.log("Setup Fee: $" + setup_charge.toFixed(2));
     console.log("Total Price per item: $" + total_line_price.toFixed(2));
 
     // Price per piece
@@ -547,7 +555,7 @@ function calculateSinglePrice(choices) {
       "Z Clip Type": choices_data.zclip,
       "Lead In For Piece": parseFloat(leadInForPiece),
       "Quantity": parseInt(choices_data.quantity),
-      "Full Lengths Needed": lengths_needed,
+      "Full Lengths Needed": total_lengths,
       "Length": parseFloat(choices_data.length),
       "Spacing": parseFloat(choices_data.spacing),
       "Hole Amount": parseInt(hole_amount),
@@ -850,7 +858,7 @@ function name_part(choice) {
   }
 
   // Always round to nearest integer for naming
-  lengthForName = Math.round(lengthForName);
+  // lengthForName = Math.round(lengthForName);
 
   // Start building the custom part name
   let custom_name = `CUS-${choice.zclip}-${lengthForName}`;
