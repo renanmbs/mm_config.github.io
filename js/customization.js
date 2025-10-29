@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", () => {
       removeUserChoice(e.target);
     }
 
-
     //UNCOMMENT THIS IF YOU WANT TO ENABLE UNIQUE PROJECT NAME
     // else if (e.target.classList.contains("change-btn")) {
     //   changeProjectName(e.target);
@@ -847,7 +846,6 @@ function packParts(parts, stockLength) {
   return barsUsed;
 }
 
-
 //Naming part function
 function name_part(choice) {
   // Determine the length to use for naming
@@ -856,9 +854,6 @@ function name_part(choice) {
   if (choice._toggleBtn?.dataset.optimized === "true") {
     lengthForName = parseFloat((choice.length - 0.125).toFixed(3));
   }
-
-  // Always round to nearest integer for naming
-  // lengthForName = Math.round(lengthForName);
 
   // Start building the custom part name
   let custom_name = `CUS-${choice.zclip}-${lengthForName}`;
