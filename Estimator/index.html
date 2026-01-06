@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Monarch Metal Custom Z Clip Configurator</title>
+  <link rel="stylesheet" href="./css/stylesheet.css" />
+  <link rel="icon" href="./img/Monarch3Logo.svg" type="image/svg+xml" />
+</head>
+
+<body>
+  <a href="https://monarchintranet.netlify.app/" title="Go to Monarch Intranet" class="logo-heada">
+    <img src="./img/Monarch3Logo.svg" class="logo-head" alt="Monarch Intranet">
+  </a>
+  
+  <h1>Custom Z Clip Configurator</h1>
+  <details>
+    <summary>How to use the configurator:</summary>
+    <ul>
+      <li>Fill up the required fields (Z Clip Option, Quantity, Length, Spacing)</li>
+      <li>Click "CALCULATE"</li>
+      <li>The answers will show up on a separate page, and you will be able to download the results in PDF</li>
+      <li>To reset the page, utilize the "Clear All Fields" button</li>
+      <li>Click the Monarch Metal logo on the results page to be redirected to the home page</li>
+      <li>For details like cut/punch charges, total inches, and setup fee, check the console (⋮ → More tools → Developer
+        tools → Console)</li>
+      <li>For optimized full lengths, click the "Optimize Length" button to consider the saw blade thickness (0.125).
+        <ul class="red-list">
+          <li>Red: Optimization is on</li>
+          <li>Black: Optimization is off</li>
+        </ul>
+      </li>
+    </ul>
+  </details>
+
+  <div id="forms">
+    <form id="customerForm">
+
+      <div class="input-row dif">
+        <div class="input-group dif">
+          <label for="comp_name">Company Name</label>
+
+          <div class="with-reset">
+            <input type="text" id="comp_name" name="comp_name" />
+            <button type="button" class="reset-field" data-target="comp_name">✕</button>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="input-row dif">
+        <div class="input-group dif">
+          <label for="proj_name">Project Name</label>
+
+          <div class="with-reset">
+            <input type="text" id="proj_name" name="proj_name" />
+            <button type="button" class="reset-field" data-target="proj_name">✕</button>
+          </div>
+
+        </div>
+      </div>
+
+      <div id="user_choice_container">
+        <div class="user_choice1">
+          <hr class="hr2" />
+          <div class="input-row">
+            <div class="input-group">
+              <label for="zclip">Z Clip Options <span class="req">*</span></label>
+
+              <select id="zclip" name="zclip" class="zclip" required>
+                <option value="" selected disabled>Choose An Option</option>
+                <option value="MF250">MF250</option>
+                <option value="MF375">MF375</option>
+                <option value="MF625">MF625</option>
+                <option value="MFSTR-050">MFSTR-050</option>
+                <option value="MFSTR-075">MFSTR-075</option>
+                <option value="MFSTR-0375">MFSTR-0375</option>
+              </select>
+            </div>
+
+          </div>
+
+
+          <div class="input-row">
+
+            <div class="input-group">
+              <label for="hole_size">Hole Size <span class="req">*</span></label>
+
+              <select id="hole_size" name="hole_size" class="hole_size" required>
+                <option value="default" selected>Default</option>
+                <option value="0.125">0.125"</option>
+                <option value="0.156">0.156"</option>
+                <option value="0.188">0.188"</option>
+                <option value="0.203">0.203"</option>
+                <option value="0.250">0.250"</option>
+                <option value="0.313">0.313"</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label for="quant">Quantity <span class="req">*</span></label>
+              <input type="number" id="quant" name="quant" min="1" step="1" required />
+            </div>
+          </div>
+
+          <div class="input-row">
+
+            <div class="input-group">
+              <div class="label-row">
+                <label for="len" class="tooltip" data-tooltip='Length must be in 0.125" increments'>
+                  Length <span class="span2">(Inches)</span>
+                  <span class="req">*</span>
+                </label>
+
+                <button type="button" class="toggle-btn tooltip"
+                  data-tooltip='Click here to account for the saw cut thickness' aria-pressed="false" id="toggle-btn">
+                  Optimize Length
+                </button>
+              </div>
+
+              <input type="number" name="len" min="1.5" max="144" step="0.125" placeholder='Choose from 1.5" to 144"'
+                id="len" required />
+
+            </div>
+
+            <div class="input-group">
+              <label for="space" class="tooltip" data-tooltip='Spacing must be in 0.5" increment'>
+                Spacing <span class="span2">(Inches)</span><span class="req">*</span>
+              </label>
+              <input type="number" name="space" min="0" placeholder='Min. 0"' step="0.5" required id="space" />
+            </div>
+
+          </div>
+
+          <div class="input-row">
+
+            <div class="input-group">
+              <label for="notes">Additional Notes <span class="span2">(Max 130 characters)</span></label>
+              <textarea id="notes" name="notes" rows="3" cols="30" maxlength="130"
+                placeholder="e.g., Special packaging, rush order, non-standard finish, etc."></textarea>
+            </div>
+
+          </div>
+
+          <div class="input-row buttons">
+            <button type="button" class="clear-btn">Clear</button>
+            <button type="button" class="remove-btn">Remove This Option</button>
+          </div>
+
+        </div>
+      </div>
+
+      <hr class="hr3" />
+
+      <div id="form_but">
+        <button type="button" id="add_choice_btn">Add New Option</button>
+        <button type="button" id="clear_all">Clear All Fields</button>
+      </div>
+
+      <div id="but">
+        <button type="submit" id="submit_btn">CALCULATE</button>
+      </div>
+
+      <p class="span2">Please note that all measurements are in inches</p>
+
+    </form>
+
+  </div>
+
+  <script src="./js/customization.js"></script>
+</body>
+
+</html>
