@@ -349,7 +349,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- FIRST PAGE: Logo + Header + Date + Summary Table ---
     const logo = new Image();
-    logo.src = "../img/Monarch3Logo.png";
+    logo.src = "../img/image/Monarch3Logo.png";
 
     logo.onload = () => {
       const topY = margin;
@@ -465,7 +465,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const logoRow = new Image();
-        logoRow.src = "../img/image/Monarch3Logo.png";
+       logoRow.src = "../img/image/Monarch3Logo.png";
 
         const svgImg = new Image();
         const svgBlob = new Blob([svgContent], { type: "image/svg+xml" });
