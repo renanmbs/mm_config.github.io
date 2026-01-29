@@ -189,66 +189,38 @@
   </div>
 
 <script src="./js/customization.js"></script>
- <script src="https://cdn.kinde.com/js-sdk/0.2.1/kinde-auth-sdk.js"></script>
 
-<script>
+<!-- Load Kinde UMD -->
+<script type="module">
+import createKindeClient from "https://cdn.jsdelivr.net/npm/@kinde-oss/kinde-auth-pkce-js@4.3.0/+esm";
+
 (async () => {
-  // 1. Wait for the global KindeClient object to be ready
-  const waitForKinde = () => {
-    return new Promise((resolve) => {
-      if (window.KindeClient) return resolve(window.KindeClient);
-      const interval = setInterval(() => {
-        if (window.KindeClient) {
-          clearInterval(interval);
-          resolve(window.KindeClient);
-        }
-      }, 5000);
-    });
-  };
+  const kinde = await createKindeClient({
+    client_id: "8ef309ff506b4999b2356de7a95f97f8",
+    domain: "https://monarchmetal.kinde.com",
+    redirect_uri: "https://monarchzclip.netlify.app/",
+    is_dangerously_use_local_storage: true
+  });
 
-  try {
-    const KindeSDK = await waitForKinde();
+  // Handle OAuth callback if returning from Kinde
+  if (window.location.search.includes("code=")) {
+    await kinde.handleRedirectCallback();
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
 
-    // 2. Initialize using the 'new KindeClient' constructor
-    const kinde = new KindeSDK({
-      domain: "https://monarchmetal.kinde.com",
-      client_id: "8ef309ff506b4999b2356de7a95f97f8",
-      redirect_uri: window.location.origin + "/",
-      logout_uri: "https://monarchintranet.netlify.app",
-      is_dangerously_use_local_storage: true
-    });
+  // Login button - matches your auth-screen's loginBtn
+  document.getElementById("loginBtn").addEventListener("click", () => kinde.login());
 
-    // 3. Handle the redirect from Google
-    if (window.location.search.includes("code=")) {
-      await kinde.handleRedirectCallback();
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-
-    const loginBtn = document.getElementById("loginBtn");
-    const authScreen = document.getElementById("auth-screen");
-    const appScreen = document.getElementById("app");
-    const isAuthenticated = await kinde.isAuthenticated();
-
-    if (!isAuthenticated) {
-      authScreen.classList.remove("hidden");
-      appScreen.classList.add("hidden");
-
-      loginBtn.onclick = async () => {
-        loginBtn.innerText = "Connecting...";
-        await kinde.login();
-      };
-    } else {
-      authScreen.classList.add("hidden");
-      appScreen.classList.remove("hidden");
-      console.log("Welcome to Monarch Metal!");
-    }
-  } catch (err) {
-    console.error("Kinde Auth initialization failed:", err);
+  // Show/hide screens - matches your auth-screen and app divs
+  if (await kinde.isAuthenticated()) {
+    document.getElementById("auth-screen").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
+  } else {
+    document.getElementById("auth-screen").classList.remove("hidden");
+    document.getElementById("app").classList.add("hidden");
   }
 })();
 </script>
-
-
 
 </body>
 
