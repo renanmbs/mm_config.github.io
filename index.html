@@ -220,6 +220,7 @@
 
       // Login button - matches your auth-screen's loginBtn
       document.getElementById("loginBtn").addEventListener("click", () => kinde.login());
+      document.getElementById("logoutBtn").addEventListener("click", () => kinde.logout());
 
       // Show/hide screens - matches your auth-screen and app divs
       if (await kinde.isAuthenticated()) {
