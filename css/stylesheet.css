@@ -410,7 +410,6 @@ details span {
 .auth-title {
   font-size: clamp(1.8rem, 4vw, 2.4rem);
   font-weight: 800;
-  letter-spacing: 0.04em;
   margin: 0;
   color: white;
   text-transform: uppercase;
