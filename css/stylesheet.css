@@ -26,7 +26,6 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem;
   gap: 2rem;
   /* background-image: url("../img/Monarch3Logo.svg");
   background-position: center;
@@ -349,4 +348,147 @@ details span {
 .toggle-btn:hover{
   color: rgba(179, 0, 0, 0.828) !important;
   text-decoration: underline !important;
+}
+
+/* --- SHARED AUTH STYLES --- */
+
+.auth-screen {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Matching the main intranet background */
+  background: linear-gradient(135deg, #1c1c1e, #2a2a2f);
+  position: relative;
+  overflow: hidden;
+  font-family: "Montserrat", sans-serif;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100%;
+}
+
+/* Background Animated Gradient Effect (Identical to Intranet) */
+.auth-screen::after {
+  content: "";
+  position: fixed;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg,
+      rgba(195, 31, 39, 0.45) 0deg,
+      rgba(195, 31, 39, 0.45) 60deg,
+      rgba(204, 204, 204, 0.45) 120deg,
+      rgba(51, 59, 65, 0.45) 180deg,
+      rgba(51, 59, 65, 0.45) 240deg);
+  animation: rotateBg 60s linear infinite;
+  mix-blend-mode: overlay;
+  z-index: 0;
+  filter: blur(40px);
+  opacity: 0.85;
+  filter: blur(35px);
+}
+
+.auth-card {
+  background: rgba(20, 20, 22, 0.75);
+  backdrop-filter: blur(18px);
+  border-radius: 20px;
+  padding: 2rem;
+  max-width: 480px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+  z-index: 10;
+  animation: fadeUp 0.8s ease forwards;
+}
+
+
+.auth-logo {
+  width: auto;
+  height: clamp(5rem, 15vh, 8rem); /* smaller min-height for mobile */
+  margin-bottom: 1.5rem;
+}
+
+.auth-title {
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  margin: 0;
+  color: white;
+  text-transform: uppercase;
+}
+
+.auth-subtitle {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.801);
+  margin-top: 0.5rem;
+  line-height: 1.4;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.auth-primary {
+  background-color: #c31f279f;
+  font-size: 1.1rem;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: 700;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  margin-top: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.auth-primary:hover {
+  background-color: #c31f27c9;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(195, 31, 39, 0.4);
+}
+
+.auth-footnote {
+  margin-top: 2rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  opacity: 0.8;
+  text-transform: uppercase;
+  color: white;
+}
+
+/* --- ANIMATIONS --- */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes subtleFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes rotateBg {
+  0% { transform: rotate(0deg) scale(1.5); }
+  100% { transform: rotate(360deg) scale(1.5); }
+}
+
+@media (max-width: 500px) {
+  .auth-card {
+    padding: 1.5rem 1.5rem;
+  }
+  .auth-title {
+    font-size: 1.5rem;
+  }
+  .auth-subtitle {
+    font-size: 1rem;
+  }
 }

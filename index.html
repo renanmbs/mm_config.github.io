@@ -6,119 +6,140 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Monarch Metal Custom Z Clip Configurator</title>
   <link rel="stylesheet" href="./css/stylesheet.css" />
-  <link rel="icon" href="./img/Monarch3Logo.svg">
+  <link rel="icon" href="./img/image/Monarch3Logo.svg">
+
 </head>
 
 <body>
-  <img src="./img/Monarch3Logo.svg" class="logo-head">
-  <h1>Custom Z Clip Configurator</h1>
-  <details>
-    <summary>How to use the configurator:</summary>
-    <ul>
-      <li>Fill up the required fields (Z Clip Option, Quantity, Length, Spacing)</li>
-      <li>Click "CALCULATE"</li>
-      <li>The answers will show up on a separate page, and you will be able to download the results in PDF</li>
-      <li>To reset the page, utilize the "Clear All Fields" button</li>
-      <li>Click the Monarch Metal logo on the results page to be redirected to the home page</li>
-      <li>For details like cut/punch charges, total inches, and setup fee, check the console (⋮ → More tools → Developer
-        tools → Console)</li>
-      <li>For optimized full lengths, click the "Optimize Length" button to consider the saw blade thickness (0.125).
-        <ul class="red-list">
-        <li>Red: Optimization is on</li>
-        <li>Black: Optimization is off</li>
-        </ul>
-      </li>
-    </ul>
-  </details>
 
-  <div id="forms">
-    <form id="customerForm">
-
-      <!-- Company Name -->
-      <div class="input-row">
-        <div class="input-group">
-          <label for="comp_name">Company Name</label>
-
-          <div class="with-reset">
-            <input type="text" id="comp_name" name="comp_name" />
-            <button type="button" class="reset-field" data-target="comp_name">✕</button>
-          </div>
-
-        </div>
+  <!-- AUTH SCREEN -->
+  <div id="auth-screen" class="auth-screen"> <!-- REMOVE "hidden" -->
+    <div class="auth-card">
+      <img src="./img/image/Monarch Metal White Transparent.png" alt="Monarch Logo" class="auth-logo">
+      <div class="auth-hero">
+        <h1 class="auth-title">Access Restricted</h1>
+        <p class="auth-subtitle">
+          Please sign in to access this Monarch Metal tool.
+        </p>
       </div>
-
-      <!-- Project Name -->
-      <div class="input-row">
-        <div class="input-group">
-          <label for="proj_name">Project Name</label>
-
-          <div class="with-reset">
-            <input type="text" id="proj_name" name="proj_name" />
-            <button type="button" class="reset-field" data-target="proj_name">✕</button>
-          </div>
-
-        </div>
+      <div class="auth-buttons">
+        <button id="loginBtn" class="btn auth-primary">Sign in with Google</button>
       </div>
+      <p class="auth-footnote">Authorized Personnel Only</p>
+    </div>
+  </div>
 
-      <!-- Z Clip Options Container -->
-      <div id="user_choice_container">
-        <div class="user_choice1">
+  <div id="app" class="hidden">
+    <img src="./img/image/Monarch3Logo.svg" class="logo-head">
+    <h1>Custom Z Clip Configurator</h1>
+    <details>
+      <summary>How to use the configurator:</summary>
+      <ul>
+        <li>Fill up the required fields (Z Clip Option, Quantity, Length, Spacing)</li>
+        <li>Click "CALCULATE"</li>
+        <li>The answers will show up on a separate page, and you will be able to download the results in PDF</li>
+        <li>To reset the page, utilize the "Clear All Fields" button</li>
+        <li>Click the Monarch Metal logo on the results page to be redirected to the home page</li>
+        <li>For details like cut/punch charges, total inches, and setup fee, check the console (⋮ → More tools →
+          Developer
+          tools → Console)</li>
+        <li>For optimized full lengths, click the "Optimize Length" button to consider the saw blade thickness (0.125).
+          <ul class="red-list">
+            <li>Red: Optimization is on</li>
+            <li>Black: Optimization is off</li>
+          </ul>
+        </li>
+      </ul>
+    </details>
 
-          <!-- Z Clip and Quantity -->
-          <div class="input-row">
-            <div class="input-group">
-              <label for="zclip">Z Clip Options <span class="req">*</span></label>
+    <div id="forms">
+      <form id="customerForm">
 
-              <select id="zclip" name="zclip" class="zclip" required>
-                <option value="" selected disabled>Choose An Option</option>
-                <option value="MF250">MF250</option>
-                <option value="MF375">MF375</option>
-                <option value="MF625">MF625</option>
-                <option value="MFSTR-050">MFSTR-050</option>
-                <option value="MFSTR-075">MFSTR-075</option>
-                <option value="MFSTR-0375">MFSTR-0375</option>
-              </select>
+        <!-- Company Name -->
+        <div class="input-row">
+          <div class="input-group">
+            <label for="comp_name">Company Name</label>
+
+            <div class="with-reset">
+              <input type="text" id="comp_name" name="comp_name" />
+              <button type="button" class="reset-field" data-target="comp_name">✕</button>
             </div>
 
-            <div class="input-group">
-              <label for="quant">Quantity <span class="req">*</span></label>
-              <input type="number" id="quant" name="quant" min="1" step="1" required />
-            </div>
           </div>
+        </div>
 
-          <!-- Length -->
-          <div class="input-row">
+        <!-- Project Name -->
+        <div class="input-row">
+          <div class="input-group">
+            <label for="proj_name">Project Name</label>
 
-            <div class="input-group">
-              <div class="label-row">
-                <label for="len" class="tooltip" data-tooltip='Length must be in 0.125" increments'>
-                  Length <span class="span2">(Inches)</span>
-                  <span class="req">*</span>
-                </label>
+            <div class="with-reset">
+              <input type="text" id="proj_name" name="proj_name" />
+              <button type="button" class="reset-field" data-target="proj_name">✕</button>
+            </div>
 
-                <button type="button" class="toggle-btn tooltip"
-                  data-tooltip='Click here to account for the saw cut thickness' aria-pressed="false" id="toggle-btn">
-                  Optimize Length
-                </button>
+          </div>
+        </div>
+
+        <!-- Z Clip Options Container -->
+        <div id="user_choice_container">
+          <div class="user_choice1">
+
+            <!-- Z Clip and Quantity -->
+            <div class="input-row">
+              <div class="input-group">
+                <label for="zclip">Z Clip Options <span class="req">*</span></label>
+
+                <select id="zclip" name="zclip" class="zclip" required>
+                  <option value="" selected disabled>Choose An Option</option>
+                  <option value="MF250">MF250</option>
+                  <option value="MF375">MF375</option>
+                  <option value="MF625">MF625</option>
+                  <option value="MFSTR-050">MFSTR-050</option>
+                  <option value="MFSTR-075">MFSTR-075</option>
+                  <option value="MFSTR-0375">MFSTR-0375</option>
+                </select>
               </div>
 
-              <input type="number" name="len" min="1.5" max="144" step="0.125" placeholder='Choose from 1.5" to 144"'
-                id="len" required />
+              <div class="input-group">
+                <label for="quant">Quantity <span class="req">*</span></label>
+                <input type="number" id="quant" name="quant" min="1" step="1" required />
+              </div>
+            </div>
+
+            <!-- Length -->
+            <div class="input-row">
+
+              <div class="input-group">
+                <div class="label-row">
+                  <label for="len" class="tooltip" data-tooltip='Length must be in 0.125" increments'>
+                    Length <span class="span2">(Inches)</span>
+                    <span class="req">*</span>
+                  </label>
+
+                  <button type="button" class="toggle-btn tooltip"
+                    data-tooltip='Click here to account for the saw cut thickness' aria-pressed="false" id="toggle-btn">
+                    Optimize Length
+                  </button>
+                </div>
+
+                <input type="number" name="len" min="1.5" max="144" step="0.125" placeholder='Choose from 1.5" to 144"'
+                  id="len" required />
+
+              </div>
+
+              <div class="input-group">
+                <label for="space" class="tooltip" data-tooltip='Spacing must be in 0.5" increment'>
+                  Spacing <span class="span2">(Inches)</span><span class="req">*</span>
+                </label>
+                <input type="number" name="space" min="0" placeholder='Min. 0"' step="0.5" required id="space" />
+              </div>
 
             </div>
 
-            <div class="input-group">
-              <label for="space" class="tooltip" data-tooltip='Spacing must be in 0.5" increment'>
-                Spacing <span class="span2">(Inches)</span><span class="req">*</span>
-              </label>
-              <input type="number" name="space" min="0" placeholder='Min. 0"' step="0.5" required id="space" />
-            </div>
+            <!-- Add different hole sizes in the future -->
 
-          </div>
-
-          <!-- Add different hole sizes in the future -->
-
-          <!-- <div class="input-row">
+            <!-- <div class="input-row">
                 <div class="input-group">
                     <fieldset>
                         <legend>
@@ -138,34 +159,39 @@
                 </div>
             </div> -->
 
-          <!-- Buttons for options -->
-          <div class="input-row buttons">
-            <button type="button" class="clear-btn">Clear</button>
-            <button type="button" class="remove-btn">Remove This Option</button>
-            <!-- <button type="button" class="change-btn">Set Unique Project Name</button> ADD ON JAVASCRIPT AS WELL -->
+            <!-- Buttons for options -->
+            <div class="input-row buttons">
+              <button type="button" class="clear-btn">Clear</button>
+              <button type="button" class="remove-btn">Remove This Option</button>
+              <!-- <button type="button" class="change-btn">Set Unique Project Name</button> ADD ON JAVASCRIPT AS WELL -->
+            </div>
+
           </div>
-
         </div>
-      </div>
 
-      <!-- Add new option -->
-      <div id="form_but">
-        <button type="button" id="add_choice_btn">Add New Option</button>
-        <button type="button" id="clear_all">Clear All Fields</button>
-      </div>
+        <!-- Add new option -->
+        <div id="form_but">
+          <button type="button" id="add_choice_btn">Add New Option</button>
+          <button type="button" id="clear_all">Clear All Fields</button>
+        </div>
 
-      <!-- Final submission -->
-      <div id="but">
-        <button type="submit" id="submit_btn">CALCULATE</button>
-      </div>
+        <!-- Final submission -->
+        <div id="but">
+          <button type="submit" id="submit_btn">CALCULATE</button>
+        </div>
 
-      <p class="span2">Please note that all measurements are in inches</p>
+        <p class="span2">Please note that all measurements are in inches</p>
 
-    </form>
+      </form>
+
+    </div>
 
   </div>
 
+  <script src="https://unpkg.com/@kinde-oss/kinde-auth-pkce-js@0.1.2/dist/kinde-auth-pkce-js.umd.js"></script>
+<script src="./js/auth.js"></script>
   <script src="./js/customization.js"></script>
+
 </body>
 
 </html>
