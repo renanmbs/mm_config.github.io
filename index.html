@@ -13,7 +13,7 @@
 <body>
 
   <!-- AUTH SCREEN -->
-  <div id="auth-screen" class="auth-screen"> 
+  <div id="auth-screen" class="auth-screen">
     <div class="auth-card">
       <img src="./img/image/Monarch Metal White Transparent.png" alt="Monarch Logo" class="auth-logo">
       <div class="auth-hero">
@@ -31,9 +31,16 @@
 
   <div id="app">
     <div class="header-actions">
-    <button id="logoutBtn" class="logout-btn">Sign Out</button>
-  </div>
-    <img src="./img/image/Monarch3Logo.svg" class="logo-head">
+      <button id="logoutBtn" class="logout-btn">Sign Out</button>
+    </div>
+    <!-- <img src="./img/image/Monarch3Logo.svg" class="logo-head"> -->
+    <a href="https://monarchintranet.netlify.app/">
+              <img
+                src="./img/image/Monarch3Logo.svg"
+                alt="Company Logo"
+                class="logo-head"
+              />
+            </a>
     <h1>Custom Z Clip Configurator</h1>
     <details>
       <summary>How to use the configurator:</summary>
@@ -191,43 +198,43 @@
 
   </div>
 
-<script src="./js/customization.js"></script>
+  <script src="./js/customization.js"></script>
 
-<!-- Load Kinde UMD -->
-<script type="module">
-import createKindeClient from "https://cdn.jsdelivr.net/npm/@kinde-oss/kinde-auth-pkce-js@4.3.0/+esm";
+  <!-- Load Kinde UMD -->
+  <script type="module">
+    import createKindeClient from "https://cdn.jsdelivr.net/npm/@kinde-oss/kinde-auth-pkce-js@4.3.0/+esm";
 
-(async () => {
-  const kinde = await createKindeClient({
-    client_id: "8ef309ff506b4999b2356de7a95f97f8",
-    domain: "https://monarchmetal.kinde.com",
-    redirect_uri: "https://monarchzclip.netlify.app",
-    is_dangerously_use_local_storage: true
-  });
+    (async () => {
+      const kinde = await createKindeClient({
+        client_id: "8ef309ff506b4999b2356de7a95f97f8",
+        domain: "https://monarchmetal.kinde.com",
+        redirect_uri: "https://monarchzclip.netlify.app",
+        is_dangerously_use_local_storage: true
+      });
 
-  // Handle OAuth callback if returning from Kinde
-  if (window.location.search.includes("code=")) {
-    await kinde.handleRedirectCallback();
-    window.history.replaceState({}, document.title, window.location.pathname);
-  }
+      // Handle OAuth callback if returning from Kinde
+      if (window.location.search.includes("code=")) {
+        await kinde.handleRedirectCallback();
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
 
-  // Login button - matches your auth-screen's loginBtn
-  document.getElementById("loginBtn").addEventListener("click", () => kinde.login());
+      // Login button - matches your auth-screen's loginBtn
+      document.getElementById("loginBtn").addEventListener("click", () => kinde.login());
 
-  // Show/hide screens - matches your auth-screen and app divs
-  if (await kinde.isAuthenticated()) {
-    document.getElementById("auth-screen").classList.add("hidden");
-    const app = document.getElementById("app");
-app.classList.remove("hidden");
-// Force browser to recalc
-app.offsetHeight; 
+      // Show/hide screens - matches your auth-screen and app divs
+      if (await kinde.isAuthenticated()) {
+        document.getElementById("auth-screen").classList.add("hidden");
+        const app = document.getElementById("app");
+        app.classList.remove("hidden");
+        // Force browser to recalc
+        app.offsetHeight;
 
-  } else {
-    document.getElementById("auth-screen").classList.remove("hidden");
-    document.getElementById("app").classList.add("hidden");
-  }
-})();
-</script>
+      } else {
+        document.getElementById("auth-screen").classList.remove("hidden");
+        document.getElementById("app").classList.add("hidden");
+      }
+    })();
+  </script>
 
 </body>
 
