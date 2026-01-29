@@ -214,7 +214,11 @@ import createKindeClient from "https://cdn.jsdelivr.net/npm/@kinde-oss/kinde-aut
   // Show/hide screens - matches your auth-screen and app divs
   if (await kinde.isAuthenticated()) {
     document.getElementById("auth-screen").classList.add("hidden");
-    document.getElementById("app").classList.remove("hidden");
+    const app = document.getElementById("app");
+app.classList.remove("hidden");
+// Force browser to recalc
+app.offsetHeight; 
+
   } else {
     document.getElementById("auth-screen").classList.remove("hidden");
     document.getElementById("app").classList.add("hidden");
