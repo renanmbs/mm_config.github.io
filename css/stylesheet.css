@@ -404,8 +404,8 @@ details span {
   -webkit-backdrop-filter: blur(18px);
   border-radius: 20px;
   padding: 3rem 3.5rem;
-  max-width: 480px;
-  width: 90%;
+  max-width: 600px;
+  width: 100%;
   text-align: center;
   position: relative;
   z-index: 10;
@@ -414,17 +414,29 @@ details span {
 
 .auth-logo {
   width: auto;
-  height: clamp(5.5rem, 15vh, 9rem); /* Standardized for all views */
+  /* Use a fixed max-height to ensure it never gets "too big" */
+  height: 7rem; 
+  /* Responsive adjustment for mobile */
+  max-height: 120px; 
+  object-fit: contain;
   margin-bottom: 1.5rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .auth-title {
-  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  font-family: "Montserrat", sans-serif !important;
+  font-size: clamp(1.8rem, 4vw, 2.2rem);
   font-weight: 800;
   margin: 0;
   color: white;
   text-transform: uppercase;
+  /* Hard-code the spacing to prevent inherited overrides */
+  letter-spacing: 0.5px !important; 
+  line-height: 1.2;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .auth-subtitle {
@@ -436,6 +448,7 @@ details span {
 
 .auth-primary {
   background-color: #c31f279f;
+  font-family: "Montserrat", sans-serif !important;
   font-size: 1.1rem;
   padding: 1rem 2rem;
   border-radius: 8px;
@@ -447,7 +460,7 @@ details span {
   width: 100%;
   margin-top: 1.5rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1px !important;
 }
 
 .auth-primary:hover {
