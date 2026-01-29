@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let noteY = 1300;
 
     const logo = new Image();
-    logo.src = "../img/Monarch3Logo.png";
+    logo.src = "../img/image/Monarch3Logo.png";
 
     const svgImg = new Image();
     const svgBlob = new Blob([svgContent], { type: "image/svg+xml" });
@@ -465,7 +465,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const logoRow = new Image();
-        logoRow.src = "../img/Monarch3Logo.png";
+        logoRow.src = "../img/image/Monarch3Logo.png";
 
         const svgImg = new Image();
         const svgBlob = new Blob([svgContent], { type: "image/svg+xml" });

@@ -422,10 +422,10 @@ details span {
   margin-top: 0.5rem;
   line-height: 1.4;
 }
-
+/* 
 .hidden {
     display: none !important;
-}
+} */
 
 .auth-primary {
   background-color: #c31f279f;
