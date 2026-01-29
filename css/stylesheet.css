@@ -350,14 +350,13 @@ details span {
   text-decoration: underline !important;
 }
 
-/* --- SHARED AUTH STYLES --- */
+/* --- UNIFIED MASTER AUTH STYLES --- */
 
 .auth-screen {
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  /* Matching the main intranet background */
   background: linear-gradient(135deg, #1c1c1e, #2a2a2f);
   position: relative;
   overflow: hidden;
@@ -367,7 +366,7 @@ details span {
   width: 100%;
 }
 
-/* Background Animated Gradient Effect (Identical to Intranet) */
+/* Background Animated Gradient Effect */
 .auth-screen::after {
   content: "";
   position: fixed;
@@ -384,14 +383,14 @@ details span {
   z-index: 0;
   filter: blur(40px);
   opacity: 0.85;
-  filter: blur(35px);
 }
 
 .auth-card {
-  background: rgba(20, 20, 22, 0.75);
+  background: rgba(20, 20, 22, 0.65);
   backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   border-radius: 20px;
-  padding: 2rem;
+  padding: 3rem 3.5rem;
   max-width: 480px;
   width: 90%;
   text-align: center;
@@ -400,10 +399,9 @@ details span {
   animation: fadeUp 0.8s ease forwards;
 }
 
-
 .auth-logo {
   width: auto;
-  height: clamp(5rem, 15vh, 8rem); /* smaller min-height for mobile */
+  height: clamp(5.5rem, 15vh, 9rem); /* Standardized for all views */
   margin-bottom: 1.5rem;
 }
 
@@ -413,6 +411,7 @@ details span {
   margin: 0;
   color: white;
   text-transform: uppercase;
+  -webkit-font-smoothing: antialiased;
 }
 
 .auth-subtitle {
@@ -420,10 +419,6 @@ details span {
   color: rgba(255, 255, 255, 0.801);
   margin-top: 0.5rem;
   line-height: 1.4;
-}
-
-.hidden {
-    display: none !important;
 }
 
 .auth-primary {
@@ -470,24 +465,24 @@ details span {
   }
 }
 
-@keyframes subtleFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
 @keyframes rotateBg {
   0% { transform: rotate(0deg) scale(1.5); }
   100% { transform: rotate(360deg) scale(1.5); }
 }
 
+/* MOBILE RESPONSIVENESS (Crucial for consistency) */
 @media (max-width: 500px) {
   .auth-card {
-    padding: 1.5rem 1.5rem;
+    padding: 2rem 1.5rem;
   }
   .auth-title {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
   }
   .auth-subtitle {
     font-size: 1rem;
   }
+}
+
+.hidden {
+    display: none !important;
 }
