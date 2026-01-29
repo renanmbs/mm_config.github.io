@@ -30,10 +30,6 @@
   </div>
 
   <div id="app" class="hidden">
-    <!-- <div class="header-actions">
-      <button id="logoutBtn" class="logout-btn">Sign Out</button>
-    </div> -->
-    <!-- <img src="./img/image/Monarch3Logo.svg" class="logo-head"> -->
     <a href="https://monarchintranet.netlify.app/">
               <img
                 src="./img/image/Monarch3Logo.svg"
@@ -202,40 +198,55 @@
 
   <!-- Load Kinde UMD -->
   <script type="module">
-    import createKindeClient from "https://cdn.jsdelivr.net/npm/@kinde-oss/kinde-auth-pkce-js@4.3.0/+esm";
+  import createKindeClient from "https://cdn.jsdelivr.net/npm/@kinde-oss/kinde-auth-pkce-js@4.3.0/+esm";
 
-    (async () => {
-      const kinde = await createKindeClient({
-        client_id: "8ef309ff506b4999b2356de7a95f97f8",
-        domain: "https://monarchmetal.kinde.com",
-        redirect_uri: "https://monarchzclip.netlify.app",
-        is_dangerously_use_local_storage: true
-      });
+  (async () => {
+    const kinde = await createKindeClient({
+      client_id: "8ef309ff506b4999b2356de7a95f97f8",
+      domain: "https://monarchmetal.kinde.com",
+      redirect_uri: "https://monarchzclip.netlify.app",
+      is_dangerously_use_local_storage: true
+    });
 
-      // Handle OAuth callback if returning from Kinde
-      if (window.location.search.includes("code=")) {
-        await kinde.handleRedirectCallback();
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-
-      // Login button - matches your auth-screen's loginBtn
-      document.getElementById("loginBtn").addEventListener("click", () => kinde.login());
-      document.getElementById("logoutBtn").addEventListener("click", () => kinde.logout());
-
-      // Show/hide screens - matches your auth-screen and app divs
-      if (await kinde.isAuthenticated()) {
+    // --- 1. UI Toggle Logic ---
+    const updateUI = async () => {
+      const isAuthed = await kinde.isAuthenticated();
+      if (isAuthed) {
         document.getElementById("auth-screen").classList.add("hidden");
-        const app = document.getElementById("app");
-        app.classList.remove("hidden");
-        // Force browser to recalc
-        app.offsetHeight;
-
+        document.getElementById("app").classList.remove("hidden");
       } else {
         document.getElementById("auth-screen").classList.remove("hidden");
         document.getElementById("app").classList.add("hidden");
       }
-    })();
-  </script>
+    };
+
+    // --- 2. Handle the redirect callback (The ?code= part) ---
+    if (window.location.search.includes("code=") || window.location.search.includes("state=")) {
+      try {
+        await kinde.handleRedirectCallback();
+        // Clean the URL so the code doesn't stay in the address bar
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } catch (err) {
+        console.error("Auth error:", err);
+      }
+    }
+
+    // --- 3. Setup Button Listeners ---
+    document.getElementById("loginBtn").addEventListener("click", () => kinde.login());
+    
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", async () => {
+        await kinde.logout();
+        // Since logout often triggers a redirect, we'll try to update UI just in case
+        await updateUI(); 
+      });
+    }
+
+    // --- 4. Initial UI Check on Load ---
+    await updateUI();
+  })();
+</script>
 
 </body>
 
