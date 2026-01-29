@@ -189,56 +189,65 @@
   </div>
 
 <script src="./js/customization.js"></script>
-  
-  <script src="https://cdn.jsdelivr.net/npm/@kinde-oss/kinde-auth-pkce-js@5.10.1/dist/kinde-auth-pkce-js.umd.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/@kinde-oss/kinde-auth-pkce-js@5.10.1/dist/kinde-auth-pkce-js.umd.min.js"></script>
 
-  <script>
-  (async () => {
-    try {
-      // The CDN uses 'Kinde', not 'KindeAuth'
-      if (!window.Kinde) throw new Error("Kinde library failed to load from CDN");
+<script>
+(async () => {
+  // 1. HELPER: Wait for the CDN to attach 'Kinde' to the window object
+  const waitForKinde = () => {
+    return new Promise((resolve) => {
+      if (window.Kinde) return resolve(window.Kinde);
+      const interval = setInterval(() => {
+        if (window.Kinde) {
+          clearInterval(interval);
+          resolve(window.Kinde);
+        }
+      }, 100); // Check every 100ms
+    });
+  };
 
-      const kinde = await Kinde.createKindeClient({
-        client_id: "8ef309ff506b4999b2356de7a95f97f8",
-        domain: "https://monarchmetal.kinde.com",
-        redirect_uri: window.location.origin + "/", // This handles both Localhost and Netlify
-        logout_uri: "https://monarchintranet.netlify.app",
-        is_dangerously_use_local_storage: true
-      });
+  try {
+    const KindeLib = await waitForKinde();
 
-      // Handle the code back from Google
-      if (window.location.search.includes("code=")) {
-        await kinde.handleRedirectCallback();
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
+    // 2. INITIALIZE: Note the use of window.location.origin
+    const kinde = await KindeLib.createKindeClient({
+      client_id: "8ef309ff506b4999b2356de7a95f97f8",
+      domain: "https://monarchmetal.kinde.com",
+      redirect_uri: window.location.origin + "/", 
+      logout_uri: "https://monarchintranet.netlify.app",
+      is_dangerously_use_local_storage: true
+    });
 
-      const loginBtn = document.getElementById("loginBtn");
-      const authScreen = document.getElementById("auth-screen");
-      const appScreen = document.getElementById("app");
-      const isAuthenticated = await kinde.isAuthenticated();
-
-      if (!isAuthenticated) {
-        authScreen.classList.remove("hidden");
-        appScreen.classList.add("hidden");
-
-        loginBtn.addEventListener("click", async () => {
-          loginBtn.innerText = "Connecting...";
-          try {
-            await kinde.login(); 
-          } catch (err) {
-            console.error("Login failed:", err);
-            loginBtn.innerText = "Sign in with Google";
-          }
-        });
-      } else {
-        authScreen.classList.add("hidden");
-        appScreen.classList.remove("hidden");
-      }
-    } catch (err) {
-      console.error("Kinde Auth initialization failed:", err);
+    // 3. REDIRECT HANDLING
+    if (window.location.search.includes("code=")) {
+      await kinde.handleRedirectCallback();
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
-  })();
-  </script>
+
+    // 4. UI SELECTION
+    const loginBtn = document.getElementById("loginBtn");
+    const authScreen = document.getElementById("auth-screen");
+    const appScreen = document.getElementById("app");
+    const isAuthenticated = await kinde.isAuthenticated();
+
+    if (!isAuthenticated) {
+      authScreen.classList.remove("hidden");
+      appScreen.classList.add("hidden");
+
+      loginBtn.onclick = async () => {
+        loginBtn.innerText = "Connecting...";
+        await kinde.login();
+      };
+    } else {
+      authScreen.classList.add("hidden");
+      appScreen.classList.remove("hidden");
+      console.log("User is authenticated");
+    }
+  } catch (err) {
+    console.error("Kinde Auth initialization failed:", err);
+  }
+})();
+</script>
 
 
 
