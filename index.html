@@ -189,27 +189,27 @@
   </div>
 
 <script src="./js/customization.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/@kinde-oss/kinde-auth-pkce-js@5.10.1/dist/kinde-auth-pkce-js.umd.min.js"></script>
+ <script src="https://unpkg.com/@kinde-oss/kinde-auth-pkce-js@0.1.2/dist/kinde-auth-pkce-js.umd.js"></script>
 
 <script>
 (async () => {
-  // 1. HELPER: Wait for the CDN to attach 'Kinde' to the window object
   const waitForKinde = () => {
     return new Promise((resolve) => {
-      if (window.Kinde) return resolve(window.Kinde);
+      // We check for KindeAuth specifically for this CDN version
+      if (window.KindeAuth) return resolve(window.KindeAuth);
       const interval = setInterval(() => {
-        if (window.Kinde) {
+        if (window.KindeAuth) {
           clearInterval(interval);
-          resolve(window.Kinde);
+          resolve(window.KindeAuth);
         }
-      }, 100); // Check every 100ms
+      }, 100);
     });
   };
 
   try {
     const KindeLib = await waitForKinde();
 
-    // 2. INITIALIZE: Note the use of window.location.origin
+    // Use KindeLib.createKindeClient
     const kinde = await KindeLib.createKindeClient({
       client_id: "8ef309ff506b4999b2356de7a95f97f8",
       domain: "https://monarchmetal.kinde.com",
@@ -218,13 +218,11 @@
       is_dangerously_use_local_storage: true
     });
 
-    // 3. REDIRECT HANDLING
     if (window.location.search.includes("code=")) {
       await kinde.handleRedirectCallback();
       window.history.replaceState({}, document.title, window.location.pathname);
     }
 
-    // 4. UI SELECTION
     const loginBtn = document.getElementById("loginBtn");
     const authScreen = document.getElementById("auth-screen");
     const appScreen = document.getElementById("app");
@@ -241,7 +239,6 @@
     } else {
       authScreen.classList.add("hidden");
       appScreen.classList.remove("hidden");
-      console.log("User is authenticated");
     }
   } catch (err) {
     console.error("Kinde Auth initialization failed:", err);
