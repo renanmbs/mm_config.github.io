@@ -1,0 +1,396 @@
+/*
+
+Palette:
+
+Red - #bd2225
+Grey - #3e4140
+White - #f6f4f5
+
+*/
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.logo-head{
+  height: 8rem;
+  width: auto;
+}
+
+.logo-heada{
+  text-decoration: none;
+}
+
+body {
+  font-family: sans-serif;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  gap: 2rem;
+  /* background-image: url("../img/Monarch3Logo.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-attachment: fixed; */
+}
+
+h1 {
+  font-size: 1.8rem;
+}
+
+hr{
+  border-color: rgba(189, 34, 37,0.5);
+  margin: 3rem;
+}
+
+.hr2{
+  border-color: rgba(189, 34, 37,0.5);
+  margin: 0rem 3rem 3rem 3rem;
+}
+
+.hr3{
+  border-color: rgba(189, 34, 37,0.5);
+  margin: 0rem 3rem 1rem 3rem;
+}
+
+.dif{
+  margin: 0 !important;
+}
+
+/* Form container */
+#forms {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Form styling */
+form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Grouped row of inputs */
+.input-row {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.input-row2 {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  text-align: left;
+}
+
+.input-group2 {
+  display: flex;
+  flex-direction: column;
+}
+
+input,
+select,
+textarea { /* <--- ADDED TEXTAREA HERE */
+  padding: 0.6rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+label {
+  margin-bottom: 0.4rem;
+  font-weight: bold;
+  color: #3e4140; /* Match the dark grey from your palette */
+}
+
+textarea:focus {
+  outline: none; /* Remove default browser outline */
+  border-color: #bd2225; /* Use the brand red for the border */
+  box-shadow: 0 0 0 2px rgba(189, 34, 37, 0.4); /* Subtle red glow */
+}
+
+
+.req {
+  color: red;
+}
+
+/* Each input and label combo */
+.input-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 220px;
+}
+
+label {
+  margin-bottom: 0.4rem;
+  font-weight: bold;
+}
+
+input,
+select {
+  padding: 0.6rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+select {
+  background-color: rgb(249, 249, 250);
+}
+
+option {
+  padding: 0.5rem;
+  background-color: grey;
+  color: white;
+}
+
+#form_but {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+#form_but2 {
+  display: flex;
+  margin: 0 !important;
+  align-items: center;
+}
+
+#clear_all {
+  background-color: transparent !important;
+  font-size: smaller !important;
+  color: rgb(179, 0, 0) !important;
+  transition: all 0.3s ease, color 0.3s ease;
+}
+
+#form_but button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: lightgrey;
+  color: black;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#clear_all:hover {
+  text-decoration: underline;
+  color: #3e4140 !important;
+  background-color: transparent;
+}
+
+
+/* Buttons inside each user_choice1 */
+.user_choice1 .buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.user_choice1 button {
+  background-color: lightgrey;
+  color: black;
+  padding: 0.4rem 1rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.user_choice1 button:hover {
+  background-color: grey;
+  color: white;
+}
+
+/* Final submit button */
+#but {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+#submit_btn {
+  padding: 1rem 8rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: #bd2225;
+  color: white;
+  transition: all 0.6s ease;
+  border: 2px solid transparent !important; 
+}
+
+#submit_btn:hover {
+  background-color: #bd2225cf !important; /* only the color changes on hover */
+}
+
+#submit_btn:active {
+  scale: 0.9;
+}
+
+.with-reset {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.with-reset input {
+  flex: 1;
+  padding-right: 2rem;
+  /* space for button */
+}
+
+.with-reset .reset-field {
+  position: absolute;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  color: #888;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+/* Tooltip applied to any element with class "tooltip" */
+.tooltip {
+  position: relative; /* for the tooltip pseudo-element */
+  display: inline-block;
+  cursor: pointer; /* optional, gives hover feedback */
+  text-align: left; /* keeps text alignment */
+}
+
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 125%; /* positions above the element */
+  left: 0;       /* aligns with element start */
+  background: white;
+  color: #333;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  font-size: 0.9rem;
+  min-width: 150px; /* optional, keeps tooltip readable */
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 100;
+  font-weight: bold;
+}
+
+.tooltip:hover::after {
+  opacity: 1;
+}
+
+.with-reset .reset-field:hover {
+  color: red;
+  background-color: transparent;
+}
+
+.toggle-btn.optimized-btn {
+  color: rgb(179, 0, 0);
+}
+
+.hole_radio input[type="radio"] {
+  margin: 1rem 0.25rem 1rem 0.5rem;
+}
+
+.hole_radio label {
+  font-weight: normal;
+}
+
+legend {
+  font-weight: bold;
+}
+
+fieldset legend span {
+  font-weight: normal;
+}
+
+label>span[data-tooltip] {
+  font-weight: normal;
+}
+
+details ul {
+  margin: 1.5rem 2rem .5rem 0;
+}
+
+details ul .red-list{
+  margin: .5rem 2rem .5rem 0 !important;
+}
+
+details li {
+  margin: 0.5rem 0rem 0 2rem;
+}
+
+details p {
+  margin: 0.5rem;
+}
+
+details span {
+  color: darkred;
+  font-weight: bold;
+}
+
+.span2 {
+  text-align: center;
+  font-size: 0.8rem;
+  color: grey;
+}
+
+#add_choice_btn {
+  background-color: #3e4140 !important;
+  color: white !important;
+  border: 2px solid transparent !important; /* reserve space to prevent scaling */
+  border-radius: 4px !important;
+  transition: background-color 0.3s ease-in-out, background-color 0.3s ease-in-out !important;
+}
+
+#add_choice_btn:hover {
+  background: #3e4140d0 !important; /* only the color changes on hover */
+}
+
+.tooltip {
+  text-align: left;
+}
+
+.toggle-btn{
+  background-color: transparent !important;
+  margin: 0 !important;
+  width: auto !important;
+  padding: 0 !important;
+  font-style: italic !important;
+  text-decoration: none !important;
+  font-size: 0.8rem !important;
+}
+
+.toggle-btn:hover{
+  color: rgba(179, 0, 0, 0.828) !important;
+  text-decoration: underline !important;
+}
