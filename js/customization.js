@@ -318,43 +318,43 @@ document.querySelectorAll(".reset-field").forEach(btn => {
 
 // Database of pricing tiers
 const pricingTiers_MF625 = [
-  { max: 19, price: 27.30 },
-  { max: 39, price: 25.39 },
-  { max: 79, price: 21.57 },
-  { max: 159, price: 20.48 },
-  { max: Infinity, price: 20.20 }
+  { max: 19, price: 28.67 },
+  { max: 39, price: 26.66 },
+  { max: 79, price: 22.65 },
+  { max: 159, price: 21.50 },
+  { max: Infinity, price: 21.21 }
 ];
 
 const pricingTiers_MF250 = [
-  { max: 19, price: 30.22 },
-  { max: 39, price: 28.41 },
-  { max: 79, price: 24.48 },
-  { max: 159, price: 23.57 },
-  { max: Infinity, price: 23.27 }
+  { max: 19, price: 31.73 },
+  { max: 39, price: 29.83 },
+  { max: 79, price: 25.70 },
+  { max: 159, price: 24.75 },
+  { max: Infinity, price: 24.43 }
 ];
 
 const pricingTiers_MFSTR_050 = [
-  { max: 19, price: 51.10 },
-  { max: 39, price: 49.57 },
-  { max: 79, price: 44.97 },
-  { max: 159, price: 38.84 },
-  { max: Infinity, price: 36.79 }
+  { max: 19, price: 53.66 },
+  { max: 39, price: 52.05 },
+  { max: 79, price: 47.22 },
+  { max: 159, price: 40.78 },
+  { max: Infinity, price: 38.63 }
 ];
 
 const pricingTiers_MFSTR_0375 = [
-  { max: 19, price: 72.22 },
-  { max: 39, price: 70.05 },
-  { max: 79, price: 63.55 },
-  { max: 159, price: 54.89 },
-  { max: Infinity, price: 52.00 }
+  { max: 19, price: 75.83},
+  { max: 39, price: 73.55 },
+  { max: 79, price: 66.73 },
+  { max: 159, price: 57.63 },
+  { max: Infinity, price: 54.60 }
 ];
 
 const pricingTiers_MFSTR_075 = [
-  { max: 19, price: 107.69 },
-  { max: 39, price: 104.46 },
-  { max: 79, price: 94.77 },
-  { max: 159, price: 81.84 },
-  { max: Infinity, price: 77.54 }
+  { max: 19, price: 113.07 },
+  { max: 39, price: 109.68 },
+  { max: 79, price: 99.51 },
+  { max: 159, price: 85.93 },
+  { max: Infinity, price: 81.42 }
 ];
 
 //Set up fee
