@@ -334,7 +334,7 @@ const pricingTiers_MF250 = [
 ];
 
 const pricingTiers_MFSTR_050 = [
-  { max: 19, price: 56.34 },
+  { max: 9, price: 56.34 },   // was max: 19
   { max: 39, price: 54.65 },
   { max: 79, price: 49.58 },
   { max: 159, price: 42.82 },
@@ -342,7 +342,7 @@ const pricingTiers_MFSTR_050 = [
 ];
 
 const pricingTiers_MFSTR_0375 = [
-  { max: 19, price: 79.62},
+  { max: 9, price: 79.62 },   // was max: 19
   { max: 39, price: 77.23 },
   { max: 79, price: 70.07 },
   { max: 159, price: 60.51 },
@@ -350,7 +350,7 @@ const pricingTiers_MFSTR_0375 = [
 ];
 
 const pricingTiers_MFSTR_075 = [
-  { max: 19, price: 118.72 },
+  { max: 9, price: 118.72 },  // was max: 19
   { max: 39, price: 115.16 },
   { max: 79, price: 104.49 },
   { max: 159, price: 90.23 },
